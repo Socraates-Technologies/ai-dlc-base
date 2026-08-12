@@ -219,6 +219,14 @@ ACs must not contradict them. Surface any conflict before writing a unit — do 
 - [one binding decision per bullet]
 ```
 
+**A constraint about USER-FACING COPY is written against the copy that already exists on the adjacent surfaces — never against the principle alone.** A copy rule derived from a doctrine reads as rigorous and can forbid the product's own best sentence, because the doctrine is about meaning and the constraint gets written about words.
+
+Worked example (Ascent, 2026-08-12). An ADR recorded that withdrawing a document destroys nothing, and that *"the surface copy must say so plainly, or a user may believe they destroyed a file they did not."* The constraint written from it became **"the word *delete* appears nowhere"**, which travelled into the design, the plan and an AC and was reviewed three times. A sibling dialog two tabs away says **"nothing is deleted"** — the exact denial the ADR asks for, and a phrase the constraint forbade. It took *writing the copy* to notice, and the AC had to be amended mid-execution.
+
+So: before writing a copy constraint, **grep the adjacent surfaces for the phrase you are about to rule on** and quote what you find into the constraint. Then state the rule as a claim about MEANING with the mechanism named — "must not assert deletion, and must state the denial explicitly, as `<sibling surface>` already does" — rather than as a banned token. A constraint phrased as a word ban is testable and wrong; one phrased as a claim needs a slightly cleverer guard and is right.
+
+The general form: **a rule about one fact, written twice from different starting points, will eventually contradict itself.** The surfaces are the source of truth for how a product says a thing; the ADR is the source of truth for what must be true.
+
 ---
 
 ## Step 7 — Handoff to Unit Decomposition
