@@ -138,6 +138,20 @@ After each pattern, ask:
 
 ---
 
+## Step 5.5 — Where new code will LIVE, and what its host already decides
+
+Before sign-off, any part of the design that says **where** new code goes gets two checks. The first is ordinary: a location claim is a claim about the tree, so verify it — who already imports the module you named, and does the codebase have a convention for this kind of thing? A location claim reads as incidental detail, so it **inherits the credibility of the verified sections beside it** and nobody checks it. Where a location cannot be verified in the session, mark it provisional and say the executing unit decides it — an unmarked wrong location is followed.
+
+The second is the one designs miss. **When the location is INSIDE an existing component, read that component's own render conditions — its early returns, its guards, the props it keys them on.** The first check asks whether the module can legally host the code. This asks a different question, one altitude up: *for which states does the host render at all?* A component is not a neutral container — it already decided who it appears for, and a new control inherits that decision silently.
+
+Worked example (Ascent, 2026-08-12), a near-miss caught only because implementation looked. A design placed a "Remove" control inside an existing per-row controls component, correctly naming the file, its props and its client/server status. That component opens `if (!canResendInvite && !canRevokeAccess) return null` — and **both are false for a person with no platform access**, which is precisely the most removable kind of record (a test entry, a duplicate from an import). Following the design as written would have shipped a control that appeared for every row EXCEPT the ones it existed for, and a test written against the obvious fixture would have passed.
+
+Note why review does not catch this: the design is *right about everything it says*. Nothing in "add a Remove control to `<Component>`, which takes `{id, status}` and is already permission-gated" is false. The omission is a fact about the host that the design never had a slot for. So the check is mechanical — **quote the host's guard conditions into the design, and state which of them the new affordance needs changed** — and where the answer is "none", say so, because "the early return is unchanged" is a claim worth having on the record.
+
+Generalises past components to any host with an admission rule: a route with a redirect gate, a menu that renders per status, a card that hides when empty.
+
+---
+
 ## Step 6 — Design Sign-off and Artifact
 
 Present a design summary before writing any files:
