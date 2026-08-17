@@ -744,6 +744,7 @@ Key items that must be present:
 - Behavioral trade-offs confirmed before accepting output
 - For wrapper/layout components: existing files grepped for patterns the new component will duplicate before generation
 - Observability section of the unit file is complete — success signal, failure signal, and alert threshold are recorded; any that represent code behavior are expressed as ACs and implemented in the diff
+- When the deliverable is a client binary (mobile app, desktop app, installer): its startup path was verified before distribution, by the strongest means the artifact allows. A passing build proves compile/link time only — dynamic-linking and startup failures appear at first launch. Where the artifact can be launched locally, launch it and reach its first screen. Where it cannot (e.g. a store-signed mobile binary, installable only through the store's own distribution channel), substitute **both** a static equivalent — resolving the binary's cross-module/dynamic symbol imports against what its bundled libraries actually export — **and** a staged rollout in which one recipient launches successfully before the rest are notified. This item must never be recorded as satisfied by a launch that cannot physically occur
 
 ### `skills/compact-docs.md`
 
