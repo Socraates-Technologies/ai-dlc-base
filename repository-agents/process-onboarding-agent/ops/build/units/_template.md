@@ -90,6 +90,8 @@ Before generating code for this unit, the agent must run these checks:
 
 - [ ] All ACs implemented and traceable to code
 - [ ] Unit tests written for each AC
+- [ ] Any procedure this unit writes that DELETES or REPLACES data (a restore, a wipe, a migration rollback, a cleanup job) has been rehearsed in this unit, and the rehearsal is recorded with its date and its result — including a first attempt that failed. A procedure is a hypothesis until it has been run
+- [ ] If this is the last unit of the last bolt of an intent: the intent's own file is closed in the same commit — its status set, what is Owed listed, and what would reopen it stated
 - [ ] Integration tests for affected module pass without modification *(or: all breaking changes listed in the Breaking Changes Register have updated tests and are approved)*
 - [ ] No secrets or hardcoded environment values
 - [ ] Auth checked on every new endpoint
