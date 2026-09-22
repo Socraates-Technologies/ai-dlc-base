@@ -128,7 +128,14 @@ If the engineer confirms an ADR, draft it immediately and present it for confirm
 **Decision:** [what was decided]
 **Why:** [the reasoning]
 **Trade-off:** [what you gave up]
+**Vendor claims:** [each thing a vendor is relied on to do, with the date it was checked — or "none"]
 ```
+
+**An ADR that names what a VENDOR will do carries the date that was checked, exactly like a version pin.**
+A scaling behaviour, a retention window, a quota, a protocol version, a tool's compatibility: each is a claim
+about somebody else's system, and it can be wrong on the day it is written or become wrong later. An undated
+mechanism is a belief, and beliefs are what the next unit builds on. If the claim was not checked, the ADR
+says so, and checking it is the first thing the unit that depends on it does.
 
 Write confirmed ADRs to `process-onboarding-agent/rules/architecture.md` before moving to the next pattern.
 
