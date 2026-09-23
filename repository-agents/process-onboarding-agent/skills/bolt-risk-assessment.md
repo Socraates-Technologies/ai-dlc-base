@@ -109,6 +109,8 @@ Partial rollback:[Each unit is independently revertible]
                  [Units [X] and [Y] must be reverted together — [reason]]
 ```
 
+**Who else deploys:** If more than one session or person can deploy to the same environment, the deploy re-reads what is live IMMEDIATELY before it acts — an unreadable reading is a stop, not "no change" — and takes a lock the others can see. The rollback target named above is read again at deploy time; the one read during this assessment may already be out of date.
+
 ---
 
 ## Step 5 — Feature Flag Requirement
