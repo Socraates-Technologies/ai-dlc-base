@@ -743,6 +743,7 @@ Key items that must be present:
 - Feature verified in a real environment — tests passing alone is not sufficient
 - **A new test is not finished until it has been seen to FAIL against the behaviour it rejects — and the break must remove the RULE, not the feature.** Deleting the feature fails every test in the group at once, so a test that could never have detected anything passes the control by hiding in the crowd. Break the single decision the test names, leave the rest standing, and confirm that test and no other goes red
 - **When a change alters an existing RULE, the tests of the old rule are re-proved, not merely re-run.** They keep passing, keep their old names, and can quietly stop guarding anything. If a test's subject has moved, rewrite it to what the rule still decides and re-prove it — never edit its expected values until it is green again
+- **Name the control that triggers each destructive call** (a delete, an overwrite a person confirms, a send) — its own click or submit, never an event derived from it (a dialog's `close`, a field's `blur`, `beforeunload`, a route change). A derived event can be withheld, or fired by something that is not the decision; the click is the only witness to it. An autosave is not a decision and is exempt
 - Nothing in the diff beyond what the ACs required (no extra abstractions or future-proofing)
 - Diff checked against system boundaries in `architecture.md`
 - Behavioral trade-offs confirmed before accepting output
