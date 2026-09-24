@@ -153,6 +153,9 @@ Provisional:     [anything marked unsure, or "none"]
 Shall I record this as the design artifact and move to unit decomposition?
 ```
 
+**A number written into the design artifact is computed by a command, and the command is kept beside it.** A count, a distance, a ratio — anything the artifact states as measured — reads as measured whether or not it was, and the next reader reasons from it. Keep the one-liner that produced it next to it, so it is re-run rather than trusted.
+*(makerclub, 2026-09-24: a design's values review said "17 have a token" and "within 6/255 of every tint" beside a scripted extraction; the numbers themselves were made in the head, and were 18 and 8.)*
+
 If the engineer confirms, create the design artifact at `process-onboarding-agent/ops/inception/designs/YYYY-MM-DD-<unix_timestamp>-[intent-slug]-design.md` and link it from the intent file under a `Design:` field in the intent header.
 
 The artifact uses this structure:
