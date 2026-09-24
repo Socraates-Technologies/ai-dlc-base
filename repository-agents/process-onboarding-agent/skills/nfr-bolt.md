@@ -33,6 +33,8 @@ The test at intake: **name the failure modes that could redden this threshold, t
 
 Declaring a defect out of scope in the unit's Scope section does **not** protect the threshold from it; scope and threshold must agree, and only the threshold closes the bolt. And if a threshold must be narrowed after measurement, record the original wording, why it failed, and who decided — a threshold quietly rewritten to match its result is not a threshold.
 
+**The struck-out list includes the INSTRUMENT.** After naming the product's failure modes, ask "what would make this threshold fail — or pass — even if the code were perfect?" and answer it about the instrument: the test runner and its timeouts, the machine, **the environment the instrument inherits from whatever runs it**, and **whether the instrument can see itself**. A test run by a script that has loaded real credentials inherits them unless the script clears them first; a process watch that searches for a string its own command line contains will find itself every time. Before believing an instrument's zero, show it a known positive. *(makerclub, 2026-09-23: a pre-deploy script loaded the live estate and then ran the gate, whose test inherited the real secrets and failed on perfect code, 37/41; a `ps` watch reported 266 "leaks" that were two per sample — itself. Both after reading a rule that named the runner and the machine, but not these.)*
+
 ---
 
 ## Step 2 — Identify Affected Intents
