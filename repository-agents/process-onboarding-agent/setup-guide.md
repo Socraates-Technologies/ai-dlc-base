@@ -939,6 +939,7 @@ Rules for writing good Given/When/Then ACs:
 - Cover at least one unhappy path per unit
 - No implementation details in ACs
 - Anti-patterns to avoid (vague outcomes, testing implementation not behavior)
+- On a web surface, an AC that says a mark is "visible" names every background it sits on and a contrast threshold — 3:1 for a focus ring or other non-text mark (WCAG 1.4.11), 4.5:1 for body text (1.4.3) — and the unit records the measured ratio for each background. A mark that is *there* passes every check that does not compare it with what is behind it
 
 
 ### `guidelines/dev-setup.md`
