@@ -93,6 +93,7 @@ Before generating code for this unit, the agent must run these checks:
 - [ ] Integration tests for affected module pass without modification *(or: all breaking changes listed in the Breaking Changes Register have updated tests and are approved)*
 - [ ] No secrets or hardcoded environment values
 - [ ] Auth checked on every new endpoint
+- [ ] If this unit ran a deploy or published an OTA: every OTHER unit whose owed deploy/OTA it carried is recorded as delivered — test each owing unit's landing commit with `git merge-base --is-ancestor <landing> <the commit you shipped>`, and write the revision or update id and the date into that unit and its backlog row *(a ship from a shared branch carries every commit beneath it; without this, other units go on saying "deploy owed" for weeks after it happened)*
 - [ ] Reviewed against `process-onboarding-agent/skills/review-checklist.md`
 - [ ] Prompt log updated in `process-onboarding-agent/prompts/`
 - [ ] Unit status set to Done in backlog
