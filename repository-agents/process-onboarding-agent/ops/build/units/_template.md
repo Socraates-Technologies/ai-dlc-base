@@ -95,6 +95,7 @@ Before generating code for this unit, the agent must run these checks:
 - [ ] Auth checked on every new endpoint
 - [ ] Reviewed against `process-onboarding-agent/skills/review-checklist.md`
 - [ ] Prompt log updated in `process-onboarding-agent/prompts/`
+- [ ] Anything this unit leaves **owed** — a device observation, a step only a named person can take, a question awaiting a ruling — has its own row in the backlog, naming who owes it and what would close it *(a mention inside this file or a status cell is not a row: after the unit closes, nobody reopens this file, and the backlog is what gets read)*
 - [ ] Unit status set to Done in backlog
 
 ---
