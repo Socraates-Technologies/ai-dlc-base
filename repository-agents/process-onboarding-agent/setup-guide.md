@@ -605,6 +605,7 @@ If the engineer defers, ask for the new date and update Section 9 before continu
 **Bug bolt:** read `{FRAMEWORK_ROOT}/skills/bug-bolt.md` when the engineer says "fix a bug", "there's a bug in X", or "bug: [description]". Do not run a full mob elaboration — follow the bug bolt workflow directly.
 **Hotfix bolt:** read `{FRAMEWORK_ROOT}/skills/hotfix-bolt.md` when the engineer says "hotfix", "production issue", "prod is down", or "emergency fix for X". Skip elaboration — begin hotfix intake immediately.
 **NFR bolt:** read `{FRAMEWORK_ROOT}/skills/nfr-bolt.md` when the engineer says "improve performance", "harden security", "accessibility improvements", "NFR bolt for X", or "non-functional work on X". Do not create a new intent — follow the NFR bolt workflow.
+**Disk hygiene skill:** read `{FRAMEWORK_ROOT}/skills/disk-hygiene.md` when the engineer invokes it, when the `Next disk hygiene sweep` date in Section 9 has been reached, or unscheduled whenever free disk space is observed below the headroom threshold in Section 9. Prompt at session start if the date is due.
 **Engagement monitoring:** read and apply `{FRAMEWORK_ROOT}/rules/engagement.md` throughout all ceremonies.
 ```
 
@@ -634,6 +635,9 @@ A single table of project-level process settings that govern AI-DLC behaviour. P
 | **Archive threshold** | [X] months | Documents older than this qualify for archiving via the compact-docs skill |
 | **Last dependency audit** | — | Updated automatically each time the dependency-audit skill runs |
 | **Next dependency audit** | YYYY-MM-DD | AI prompts at session start on or after this date; default interval is 30 days |
+| **Last disk hygiene sweep** | — | Updated automatically each time the disk-hygiene skill runs |
+| **Next disk hygiene sweep** | YYYY-MM-DD | AI prompts at session start on or after this date; default interval is 30 days |
+| **Disk headroom threshold** | 25 GiB | Free space below this triggers an unscheduled disk hygiene sweep |
 ```
 
 The archive threshold is read by the `compact-docs` skill at runtime. If this section is absent, the skill will ask the engineer for the value before proceeding.
@@ -641,6 +645,8 @@ The archive threshold is read by the `compact-docs` skill at runtime. If this se
 The dependency audit dates are read and written by the `dependency-audit` skill. The `Next dependency audit` date is checked at the start of every session — if today is on or after that date, the AI prompts the engineer to run the audit before any other work begins. Set this value during onboarding by asking the engineer:
 
 > "When would you like to schedule the first dependency and security audit? The recommended interval is once a month."
+
+The disk hygiene dates and the headroom threshold are read and written by the `disk-hygiene` skill in the same way. Ask the engineer for the first sweep date (default 30 days out) and keep the 25 GiB threshold unless their builds need more headroom.
 
 ---
 
@@ -941,6 +947,22 @@ Copy this file verbatim from `process-onboarding-agent/skills/nfr-bolt.md` to `{
 
 ```markdown
 **NFR bolt:** read `{FRAMEWORK_ROOT}/skills/nfr-bolt.md` when the engineer says "improve performance", "harden security", "accessibility improvements", "NFR bolt for X", or "non-functional work on X". Do not create a new intent — follow the NFR bolt workflow.
+```
+
+---
+
+### `skills/disk-hygiene.md`
+
+The disk-hygiene skill reclaims workstation disk space that AI-assisted development consumes passively — stale worktrees (each with a full dependency install), package-manager caches, container build caches and orphaned volumes, simulator images. Nothing else in the process reclaims it, and a full disk fails builds with misleading errors. The skill works in tiers from safe caches to judgment calls, and its two hard rules are never to delete unmerged or uncommitted work, and never to delete a dev database or untracked local data — including a dev database on an **anonymous** container volume, which it protects by cross-checking every target against every container's mounts. Every destructive step is verified by re-measuring, never by trusting the command's output.
+
+The skill is scheduled like the dependency audit — the next sweep date lives in the master rule file Section 9 — and also runs unscheduled whenever free space falls below the headroom threshold recorded there. Its commands are written for macOS with Docker and the Node, Xcode and Android toolchains; steps for tools a workstation does not have are skipped.
+
+Copy this file verbatim from `process-onboarding-agent/skills/disk-hygiene.md` to `{FRAMEWORK_ROOT}/skills/disk-hygiene.md`. No customization is needed — it reads `guidelines/dev-setup.md` at runtime to learn how the project's dev database is started.
+
+**Wire into the master rule file Section 6** by adding one routing line:
+
+```markdown
+**Disk hygiene skill:** read `{FRAMEWORK_ROOT}/skills/disk-hygiene.md` when the engineer invokes it, when the `Next disk hygiene sweep` date in Section 9 has been reached, or unscheduled whenever free disk space is observed below the headroom threshold in Section 9. Prompt at session start if the date is due.
 ```
 
 ---

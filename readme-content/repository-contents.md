@@ -26,6 +26,7 @@ This repo is the **base template** — the source of truth that gets copied into
 | `repository-agents/process-onboarding-agent/skills/bug-bolt.md` | Lightweight bolt workflow for fixing a specific, reproducible bug. Triggered by "fix a bug in X". Skips design session and elaboration; replaces them with a four-question intake, recurrence check, and a single focused unit. Runs RCA automatically if the bug is recurring. |
 | `repository-agents/process-onboarding-agent/skills/hotfix-bolt.md` | Emergency bolt for production incidents. Triggered by "hotfix" or "prod is down". Runs a three-question intake (symptom, severity, rollback), creates a minimal unit, mandates a retro and RCA within 24 hours. |
 | `repository-agents/process-onboarding-agent/skills/nfr-bolt.md` | Non-functional quality attribute bolt. Triggered by "improve performance of X", "NFR bolt for X", etc. Requires a measurable threshold AC, establishes a before/after baseline, and cross-references affected intents. Does not create a new intent. |
+| `repository-agents/process-onboarding-agent/skills/disk-hygiene.md` | Scheduled workstation disk sweep. Reclaims stale worktrees, caches, container build residue and simulator images in tiers, never touching unmerged work, dev databases or engineer data; verifies every destructive step by re-measuring. Scheduled via Section 9 of the master rule file, and run unscheduled below a free-space threshold. |
 | `repository-agents/process-onboarding-agent/ops/inception/dependency-map.md` | Intent dependency map. Records which intents depend on others and which interfaces are shared across intent boundaries; read before bolt planning, updated after every elaboration sign-off. |
 | `repository-agents/process-onboarding-agent/rules/engagement.md` | Engineer engagement monitoring — signals of disengagement, intervention script, and escalation protocol. Copied verbatim into every project. |
 | `repository-agents/process-onboarding-agent/ops/inception/intents/_template.md` | Template for writing a feature intent (includes Implementation Summary section, written when all units under the intent are delivered) |
@@ -77,6 +78,7 @@ The onboarding agent first asks where your process documentation lives, then ins
         bug-bolt.md
         hotfix-bolt.md
         nfr-bolt.md
+        disk-hygiene.md
       guidelines/
         domain-glossary.md
         edge-cases.md
