@@ -20,6 +20,8 @@ This repo is the **base template** — the source of truth that gets copied into
 | `repository-agents/process-onboarding-agent/skills/uat.md` | Acceptance testing protocol. Guides the engineer through UAT using the intent's ACs as the test script; records pass/fail/deferred outcomes; blocks intent from being marked Implemented without sign-off. |
 | `repository-agents/process-onboarding-agent/skills/process-health.md` | Process health metrics. Computes four metrics (improvement adoption, quality gate failure rate, AC revision rate, bolt velocity) and surfaces decay signals; saves a dated health report automatically. |
 | `repository-agents/process-onboarding-agent/skills/dependency-audit.md` | Monthly dependency and security posture audit. Reads manifests, classifies findings by severity, and creates remediation bolts for high/critical issues. Scheduled via Section 9 of the master rule file. |
+| `repository-agents/process-onboarding-agent/skills/architecture-review.md` | Monthly read-only code-health review. Measures the codebase against the project's own standards and ADRs, ranks drift, duplication, and complexity findings, and proposes refactors for the engineer to ratify. |
+| `repository-agents/process-onboarding-agent/skills/disk-hygiene.md` | Scheduled workstation disk sweep. Reclaims stale worktrees, caches, and container artefacts; never touches unmerged work or data. Scheduled via Section 9 of the master rule file. |
 | `repository-agents/process-onboarding-agent/skills/knowledge-promotion.md` | Cross-project learning protocol. Runs as the final step of every retro; classifies each improvement as generic (to be contributed back to this base repo) or project-specific. |
 | `repository-agents/process-onboarding-agent/skills/new-engineer-induction.md` | New engineer onboarding session. Walks a new team member through the project's framework using actual project files; produces a personalized quick-reference card. |
 | `repository-agents/process-onboarding-agent/skills/bug-bolt.md` | Lightweight bolt workflow for fixing a specific, reproducible bug. Triggered by "fix a bug in X". Skips design session and elaboration; replaces them with a four-question intake, recurrence check, and a single focused unit. Runs RCA automatically if the bug is recurring. |
@@ -70,6 +72,8 @@ The onboarding agent first asks where your process documentation lives, then ins
         uat.md
         process-health.md
         dependency-audit.md
+        architecture-review.md
+        disk-hygiene.md
         knowledge-promotion.md
         new-engineer-induction.md
         bug-bolt.md
