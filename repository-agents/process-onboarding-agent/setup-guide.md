@@ -988,10 +988,10 @@ The **Pre-generation Checks** section is critical for wrapper/layout units — l
 Fields: Status, Goal, Start/Target/Completed dates, Units table, Execution Order diagram, Risks & Assumptions, Definition of Done, Retrospective link.
 
 ### `ops/operate/retros/_template.md`
-Sections: What Went Well, What Didn't Go Well, AI-Specific Observations (prompts that worked / needed revision / quality gate failures / output accepted without enough review), Actions table, Improvements Triggered (**required** — cannot be left blank without a stated reason), New Intents Triggered, Post-Retro Improvement Workflow.
+Sections: What Went Well, What Didn't Go Well, Round Trips (how many hand verifications and builds one surface took, and what each bought), AI-Specific Observations (prompts that worked / needed revision / quality gate failures / output accepted without enough review), Actions table, Improvements Triggered (**required** — cannot be left blank without a stated reason), New Intents Triggered, Post-Retro Improvement Workflow.
 
 **The Post-Retro Improvement Workflow is mandatory and AI-driven.** Immediately after the retro document is complete, the AI must:
-1. Synthesize every finding in "What Didn't Go Well" and "AI-Specific Observations" into concrete improvement proposals — one per finding — identifying the exact file and text to change
+1. Synthesize every finding in "What Went Well" (a discipline the next session would need), "What Didn't Go Well", "Round Trips" and "AI-Specific Observations" into concrete improvement proposals — one per finding — identifying the exact file and text to change
 2. Present all proposals to the engineer for approval, rejection, or revision before touching any file
 3. **For each approved proposal:** check which open or in-progress units reference the section being changed (Pre-generation Checks, ACs, or referenced rule files) and present the impact list to the engineer before applying. Record affected units in the improvement file.
 4. For each approved proposal: create an improvement file, apply the change to the target file, and update mirror files if the master rule file was modified

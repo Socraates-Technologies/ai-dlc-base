@@ -8,6 +8,18 @@
 
 ---
 
+## Step 0 — List the Improvements Still Open
+
+An Open proposal decays exactly like a guard deferred to a code comment: a true statement of a hazard, sitting where the next person will not read it. So every run begins here:
+
+1. **List every improvement whose Status is still Open**, oldest first, one line each with the retro or RCA that raised it and its date. Say when a proposal has stayed Open across two or more retros — that is the signal, more than its age.
+2. **Put that list where work starts**, such as the backlog, not only in the retro that raised it. A proposal invisible there is one the next bolt rediscovers by shipping the defect.
+3. **Treat Open as a decision not yet made.** Each proposal is either approved and applied, or Rejected with the reason recorded — "the cost is not worth it" is a fine reason. Leaving it Open is the only answer that does not close the loop.
+
+This is prose; nothing can fail a build over an undecided proposal. It works only while the list is short and in the way.
+
+---
+
 ## Step 1 — Identify the Improvements to Evaluate
 
 If triggered by the Post-Retro Improvement Workflow, evaluate every improvement that was marked Applied in the current retro session, in order.
@@ -33,6 +45,14 @@ For each improvement, record one of:
 - **Prose only — not mechanically decidable** — the honest answer for judgement-shaped lessons. Most process improvements land here, and that is fine; the point is to have asked.
 
 A prose-only improvement whose invariant *was* mechanically decidable is the failure mode this step catches.
+
+### A rule is not finished until you can name a compliant instance that achieves nothing
+
+Ask this of the prose itself, including when the answer above was *prose only*: **try to complete the sentence "this rule could be followed completely and still achieve nothing if …".** If it can be completed, the rule is not finished — tighten it until it cannot. Compliance is checkable by reading and effectiveness is not, so a rule whose satisfaction condition is weaker than its purpose is followed by everyone and fails silently, in the direction that looks like success. (For example: "a date-dependent test names one case either side of the clock change" is satisfied in full by a test run in a timezone where both cases have the same offset.)
+
+Ask it here rather than leaving it to the rule's author: the thing the author was holding while living the incident is the thing the sentence omits, and promotion is the first reading by someone who was not there.
+
+**Ask it of the retro's and RCA's own recommendations too.** They are the most exposed, because they are written by whoever has just been the person who noticed. A rule whose trigger is an observation ("when X goes red twice, open a bug") cannot even be seen to be broken, since nothing records an observation not made. Bind such a duty to a moment that already happens — a template field, a session-start check, a Definition of Done line — or record it honestly as advice.
 
 ---
 
@@ -84,7 +104,20 @@ State the outcome to the engineer:
 
 > "[Improvement title] is project-specific ([reason]). No base repo change needed."
 
-Proceed to the next improvement.
+Run Step 3.5, then proceed to the next improvement.
+
+---
+
+## Step 3.5 — Sweep the Artefacts That Predate the Rule
+
+A new rule shapes the work created after it; nothing re-reads the work created before. For every Applied improvement, project-specific or generic, before recording its status:
+
+1. **Name the set of existing artefacts the rule would have shaped** had it existed earlier — e.g. bolts without backlog rows, units without an evidence section.
+2. **Run the sweep**, mechanically where possible, and record the command and its count in the improvement file. Never write "none found" without the command that looked.
+3. **Fix what it finds in the same change, or list each miss with an owner.**
+4. If a sweep is impractical, **write the rule's effective date into the rule**, so a later reader knows earlier artefacts were never checked.
+
+Generic improvements then continue to Step 4.
 
 ---
 

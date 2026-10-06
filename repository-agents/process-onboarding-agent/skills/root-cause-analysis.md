@@ -104,6 +104,8 @@ Write a structured report containing:
 | **Technology mitigation** | A technology limitation must be documented and worked around | ADR in `process-onboarding-agent/rules/architecture.md`; new intent if a replacement is warranted |
 | **Process fix** | A workflow, gate, or standard must change | Improvement file via the standard Post-Retro Improvement Workflow |
 
+Before presenting a process fix, ask of it the question in `skills/knowledge-promotion.md` — *could this be followed completely and still achieve nothing?* — and where the fix is a duty rather than a check, name the existing moment it attaches to. A recommendation whose trigger is an observation nobody is obliged to make will fire on nothing.
+
 Present the report to the engineer and get explicit approval on each recommendation before creating any artifact.
 
 ---
