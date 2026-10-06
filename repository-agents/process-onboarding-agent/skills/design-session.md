@@ -88,6 +88,8 @@ After each endpoint, ask:
 
 > "The field [name] looks like a synonym for [glossary term]. Should I use [glossary term] to stay consistent with the domain language?"
 
+**Named-act check:** A contract line describing something a person chose, selected, approved or confirmed must name the surface where that happens, or say it is out of scope and which unit owns it. A noun with no referent passes "every AC is testable", because each reader supplies the missing mechanism from their own head.
+
 ---
 
 ## Step 4 — Data Model
@@ -148,6 +150,8 @@ If the engineer confirms an ADR, draft it immediately and present it for confirm
 **Why:** [the reasoning]
 **Trade-off:** [what you gave up]
 ```
+
+Write a trade-off that leaves a case deliberately unserved as the exact user action that meets it, so UAT can turn it into a step.
 
 Write confirmed ADRs to `process-onboarding-agent/rules/architecture.md` before moving to the next pattern.
 
