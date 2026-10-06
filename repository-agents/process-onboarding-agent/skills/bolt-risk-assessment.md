@@ -6,6 +6,8 @@
 
 **Never skip for mature projects.** For projects with existing code, this assessment is mandatory — no unit executes without a signed-off risk assessment in the bolt file. For fresh projects with no existing modules affected, the assessment may be brief but must still be completed.
 
+**When one question needs the change to exist, split — do not defer the whole assessment.** Some risks are answerable only by a measurement that needs the code (does it fit, does it stay under budget, does it still start). Write the assessment first with that measurement as a named open item — what will be measured, where, and what answer would change the plan — and complete every sweep that does not need the code up front. The engineer can decide on an assessment with one open measurement; one written afterwards only asks them to approve a conclusion.
+
 ---
 
 ## Step 1 — Read the Bolt and Its Units
@@ -55,6 +57,21 @@ Flag any unit rated High immediately before presenting the full table:
 
 **A mechanical sweep encodes the assumptions that were true of the set it was written for — re-verify them when the set grows.** Where a unit will apply the same scripted edit across many files, its safety rests on a pre-check performed on *those* files: that they all share the shape the script assumes. That premise expires silently. A rebase, a merge, or a concurrent session can add one more file that violates it, and re-running the sweep then damages that file while reporting success. So: re-run the sweep's **pre-checks**, not merely the sweep, after any event that grows the target set; prefer a sweep that **fails loudly on an unexpected shape** over one that transforms whatever it is given; and where the invariant must outlive the sweep, land a **drift-guard test** so the gate enforces it rather than the next author remembering — the sweep fixes today, the guard fixes next week. Damage is proportional to distance from a compile error: an unused import costs one gate run, a wrong behavioural assumption costs a debugging session.
 
+**Test-coupling sweeps.** The default AC predicts that existing tests pass unmodified; check that prediction against the tests themselves before accepting its form:
+
+- **Callers, not only readers.** When a unit may change a function's signature, count its call sites (production and test separately, with the command), not just the consumers of what it returns. A new field that must be resolved from something the function does not already receive is a signature change. Decide required-versus-optional in the assessment: a required parameter makes a forgotten argument a compile error, an optional one a silently wrong answer.
+- **Every form of "what this call sends".** A request may be asserted through the client function in one suite and through an injected prop or callback in another, and by a called-with matcher in one place and a deep-equal on recorded calls in another. Search for all names and forms, then read the hits.
+- **Suites that render the application root.** An app-level or end-to-end suite names none of the components it exercises, so a symbol search cannot find it. List the root-level suites and ask whether the change is reachable from each.
+- **Fixture defaults under a new default.** When a rule changes what renders or is returned by default (a filter, a partition, a narrowed view), read the fixture helpers' default for every field the rule reads. A "neutral" fixture may fall outside the new default and empty every existing case.
+- **Fixtures that must reset, not only teardowns that will fail.** When an existing write path starts writing a table it did not write before — new or existing — list every suite that drives that path and check both its teardown (loud: a foreign-key failure names the file) and its per-test reset (silent: rows accumulate across cases until an assertion depends on an absolute count).
+- **A Register row names what the assertion checks, not a number it prints.** Open the assertion behind each row. A count over a matcher that enumerates members stays green when a member is added; the row is "the matcher gains the member and the count moves", or the guard goes blind.
+
+**When a change has several equivalent forms, measure them — do not argue them.** Where the plan has a free variable whose options are equally correct for the product (position in an ordered set, which module owns a function, which identifier stem), apply each form to a clean tree, run the affected suites, and record one row per form with its count and command. The engineer decides from the table. State what makes the forms equivalent; a form that is cheaper because it does less is pricing a different change.
+
+**A claim written into a shared document carries the search that established it.** Statements about who consumes an interface, when it became shared, or what is enforced where are reasoned from later by sessions that cannot check them. Record the command beside the claim, as for a measured number; where the search was not run, write the weaker sentence you can support.
+
+**Predict a falsification before running it.** When a finding is mitigated by a new guard, install the defect it guards against and write down how many tests should go red first. Fewer reds than predicted usually means the change dissolved one of the paths it was meant to keep, not that the guard passed. If the guard written for the defect stays green while unrelated tests catch it, its outcome probably depends on which of two concurrent operations settles last: force that ordering in the test (a deferred promise, a sequenced mock) with a comment saying why it is load-bearing.
+
 ---
 
 ## Step 3 — Cross-Unit Sequencing Risks
@@ -67,6 +84,7 @@ Look for:
 - **Partial rollout risk:** If the bolt is interrupted after some units are done but before others, is the system in a consistent state?
 - **Shared resource contention:** Two units that modify the same file, table, or config. If run in parallel, do they conflict?
 - **Contract mismatch risk:** A unit that changes an interface that a later unit in the same bolt consumes. If the producer unit changes shape after the consumer unit is written, do they fall out of sync?
+- **Deploy-order risk:** Where client and server ship separately or at different speeds, ask both ways: what does the new client do against the old server, and the old client against the new server? The dangerous answer is not an error but silent wrongness — an old server ignoring an unknown field, or an old client's default branch describing a new enum value with a false sentence. Record what the default actually does, and put the mitigation in the code (refuse the act when the dependency is absent, or hold the value back until the reader ships), because deploy order cannot be enforced by a document.
 
 Produce a sequencing risk table if any risks are found:
 
@@ -79,6 +97,10 @@ Sequencing Risks
 ```
 
 If no sequencing risks exist, state: "No cross-unit sequencing risks identified."
+
+**Wire the entry point early.** Land the control that opens a new surface as soon as that surface can stand up, not as the last unit: everything after it becomes observable in the running product, which catches defects (layout, reachability) that tests cannot see. Check what the new control makes unreachable, and that it does not open a half-built screen.
+
+**Claims about things outside the repo must be probed, not inherited.** For each unit whose sign-off depends on a manual observation, name the artefact it needs (device or simulator build, staging environment, seeded account), confirm it runs the current tree, and say who builds it — found now it is a background task, found at the gate it stalls a finished unit. Infrastructure claims (a variable is set, a resource exists) are re-probed at closeout and amended by striking the old sentence, since no test in the repo can falsify them.
 
 ---
 
@@ -158,6 +180,10 @@ Sign off to proceed with unit execution?
 ```
 
 If the engineer raises concerns or requests changes to the assessment, revise the relevant section and present the summary again. Do not proceed to Step 7 until the engineer explicitly confirms sign-off.
+
+The gate fires twice: no unit executes without a signed assessment, and nothing deploys while one is unsigned. An assessment written after the fact is presented for sign-off before the change ships, while a "no" can still matter; if it deploys unsigned, its open items become backlog rows.
+
+A decision at sign-off that withdraws or replaces a mechanism is a re-plan: search the bolt's units for the withdrawn mechanism and amend each affected Context and AC in the same commit as the assessment. A note beside a stale AC is not an amendment — the AC is what gets built.
 
 ---
 
