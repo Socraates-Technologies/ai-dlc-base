@@ -75,6 +75,19 @@ Ask the engineer:
 
 Revise the script if the engineer requests changes. Proceed only when the engineer confirms the script is ready.
 
+**A UAT session CLEARS the rows it created, and the sign-off says so.** UAT usually runs against a shared, long-lived database, by hand — so its fixtures are the one category of test data with no teardown: a suite has its `afterAll`, a CI gate rebuilds its database, and UAT has a human who is finished the moment the script passes. The cost never lands on the session that created them.
+
+Worked example (Ascent, 2026-08-12). A walkthrough needed a second tenant to prove a step, created it plus a company beneath it, recorded a clean pass, and left all three rows behind. The **next** session's full verify went red on a guard asserting the fixture leaves exactly one live tenant — *"a leaked row breaks every operator surface — clean it up"* — costing a diagnosis cycle plus a data-deletion decision that needed the engineer, on rows that session had never seen. The guard was working exactly as designed; nothing upstream of it required the fixtures to be removed.
+
+Required, before the outcome is recorded:
+
+1. **List what the session created** as you go — ids, not just names. A script that seeds anything gets a "fixtures created" line beside its steps.
+2. **Delete them in FK order** when the walkthrough ends, whatever the outcome. A FAILED UAT still cleans up: the finding belongs in the write-up, not in the database.
+3. **Record the cleanup in the sign-off** — "fixtures cleared" or "none created". A blank reads as "not looked at", exactly as an unticked checklist box does.
+4. **Where a fixture must SURVIVE** for a follow-up, say so explicitly in the sign-off and name who removes it and when. A deliberate survivor is fine; an anonymous one is what breaks somebody else's gate.
+
+The tell that this applies: if the walkthrough included the words "create a second …", it created something a guard elsewhere counts.
+
 ### Run the Session
 
 **Prove which artifact is answering before the first step.** A UAT session validates whatever is actually serving the URL, and that is not necessarily the code under test. Before step 1, establish these and record the result in the script:
