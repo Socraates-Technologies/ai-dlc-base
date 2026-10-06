@@ -683,6 +683,8 @@ Document your stack's patterns and anti-patterns. Key sections:
 - Let the database compare the timestamps it wrote (`SELECT expires_at <= now()`). Do not compare them against the app's clock: the two clocks differ, and the app's date type may drop precision. Never fix such a flake by loosening `>` to `>=`, because the loosened check cannot see an update that never ran.
 - A test that asserts on source text slices between two named anchors, never a fixed-length character window, which a new doc comment can break.
 - A shared HTTP or fetch mock answers by endpoint, never with one shape for every request. Otherwise the next call the app makes fails in a way that looks like a product bug.
+- A test file never imports another test file. Its top level is its registration, so importing it for a shared value registers its suites again under the importer's name: the count grows and nothing fails. Shared cases live in a fixtures module.
+- A test that renders code reading the clock either pins the clock or builds its fixtures from the same pinned "now". A fixture taken from the real clock at load time passes on most days and fails on the ones where it crosses a boundary the code computes (a week, a month, midnight).
 
 **Critically:** add anti-patterns discovered through actual failures — e.g. framework methods that look correct but have unit-testing limitations. These turn retro findings into permanent rules.
 
@@ -973,6 +975,7 @@ Step-by-step environment setup for a new engineer:
 - Secrets hygiene checklist
 - How to tell that new code is actually running. A dev server's reload or rebuild call that returns success is not proof. Name a sign that only a real restart produces, such as app state that resets or a build id that changes, and check it before you trust anything you see on the screen
 - Where a local run and CI differ: tests skipped locally, dependencies installed locally but not on the runner, leftovers in a shared local database. A local count that matches CI's does not mean the same tests failed. Give a recipe for reproducing CI's install shape, for example a fresh worktree that links only the dependencies CI installs
+- Give the gate's build its own output directory, never the one a running dev server serves from. A shared directory corrupts the live server, which then fails every route and looks like a hang rather than a collision
 
 ### `guidelines/team-rollout.md`
 
