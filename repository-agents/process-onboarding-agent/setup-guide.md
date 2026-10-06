@@ -662,6 +662,28 @@ Document your stack's patterns and anti-patterns. Key sections:
 - Formatting & linting tooling
 - Testing requirements and coverage thresholds
 
+**Seed these stack-independent rules on day one.** Each one comes from a run that looked like a result and was not, and nothing in a later run prompts you to look again.
+
+*Reading a verification:*
+- Take a result from the runner's own summary line. No summary line means no run, whatever the exit code said. Read the suite (file) count as well as the test count, because a suite that fails to load reports no failing tests.
+- Never read a command's outcome through a pipe. `| tail`, `| grep` and `| head` throw away output before you know which part you need, and the exit status you get is the filter's. Run the command bare, redirect both streams to a file, take `$?` from the command, then filter the file. For a command that changes state (a commit, a deploy, a migration), check the artefact it should have produced, such as the new commit or a timestamp that moved, not what it printed.
+- The instrument has its own traps, and each one fakes a result. A wrapper (`nohup`, `&`, a trailing `; echo`) reports its own exit status. A tool run outside its project directory may resolve a different global binary, so call the project's script. `;` carries on after a failed step and `&&` does not. A shell that does not word-split an unquoted variable (zsh) passes a whole list as one argument.
+- A scripted edit (sed, perl, a replace script) proves that each substitution matched. Grep for the old text afterwards as well as counting the new. An exit code says nothing about whether a pattern matched, and nested quoting can make a pattern match nothing without any error.
+- Run a formatter only on files you created, or files that were already clean at `HEAD`. Run it on someone else's file and the formatting churn buries your change. Before staging, check that `git diff --stat` is about the size of what you wrote.
+- A name that only exists as a string is invisible to the type checker: a log event, a test id, an env var key, a route path, a column inside SQL. Open the module that defines it before you write it into code, an AC or an observability check. A green typecheck is not evidence that you looked.
+- Never report a fact the code does not have. A response, message or log that says what happened ("created", "expired") gets that fact from the layer that knows it, never by guessing from what the caller sent. If an AC asks for a claim the code cannot know, reword the AC.
+
+*Falsification probes (mutate the code, watch the guard go red, restore):*
+- Commit the work before probing it, and restore from an explicit source (`git restore --source=<commit> --staged --worktree <path>`). Restoring uncommitted work from the index deletes that work, and every later probe then measures a tree without it. `git checkout <sha> -- <path>` writes the index as well, so a later plain restore puts back the wrong content. For an untracked file, take a copy with a distinct name before the first mutation. Check each restore by comparing content hashes, never by the restore command's exit code.
+- A red counts only when the tests that failed are the ones guarding the AC, so read their names. A mutation that breaks compilation, or turns many unrelated cases red, says nothing about the AC: narrow it and run it again. Pass mutation text through a file or a heredoc, never as a double-quoted shell argument, where a `$1` in SQL expands to nothing.
+- Clean up after the mutated run before you run the control, or give each run its own fixtures. Otherwise the control counts the rows the mutation left behind.
+
+*Tests that share infrastructure:*
+- Against a shared test database, scope every existence or absence check to the suite's own tenant or fixtures. A table-wide query breaks the first time a neighbouring suite's row exists.
+- Let the database compare the timestamps it wrote (`SELECT expires_at <= now()`). Do not compare them against the app's clock: the two clocks differ, and the app's date type may drop precision. Never fix such a flake by loosening `>` to `>=`, because the loosened check cannot see an update that never ran.
+- A test that asserts on source text slices between two named anchors, never a fixed-length character window, which a new doc comment can break.
+- A shared HTTP or fetch mock answers by endpoint, never with one shape for every request. Otherwise the next call the app makes fails in a way that looks like a product bug.
+
 **Critically:** add anti-patterns discovered through actual failures — e.g. framework methods that look correct but have unit-testing limitations. These turn retro findings into permanent rules.
 
 **Concurrent sessions — reserve numbers + serialise shared files.** If your project ever runs two agent sessions against one working tree, add a standing rule: two sessions collide on unit/bolt numbers and on shared cross-cutting files (schema/data-model, the migration journal, a shared domain module), and the interleaved uncommitted state often can't be split cleanly (interactive `git add -p` is unavailable). Mitigate — at elaboration sign-off, reserve a contiguous unit-number block plus the bolt number and record them immediately, then re-check right before creating files (numbers move mid-work); serialise edits to shared data-layer files (one stream at a time — migration journals are linear). Better still: run concurrent streams on separate git worktrees/branches and merge, so shared-file interleaving can't happen. **And if you do: the ahead-count is not noise.** A staleness check (`git rev-list --left-right --count origin/main...HEAD`) is standard practice in that setup, and its *behind* number answers "is this checkout safe to work in?". Its **ahead** number answers a different question that nothing else in the process asks: **is something finished and unmerged sitting HERE?** A worktree left from a previous session can hold a commit nobody is coming back for. When ahead > 0, look at what the commits are, and either merge them or state in the closing message that they were left and why — not every stranded commit is worth merging, but every one is worth a sentence. *(Coconuts, 2026-08-25: a session read "90 behind, 1 ahead", correctly moved to a fresh worktree, and left the 1 as in-progress scratch. It was a finished two-day-old commit carrying a lint rule; the rule found three live instances of the defect it prevents the moment it finally reached main — every one written during the two days it sat stranded.)*
@@ -949,6 +971,8 @@ Step-by-step environment setup for a new engineer:
 - How to start each service
 - Auth verification steps
 - Secrets hygiene checklist
+- How to tell that new code is actually running. A dev server's reload or rebuild call that returns success is not proof. Name a sign that only a real restart produces, such as app state that resets or a build id that changes, and check it before you trust anything you see on the screen
+- Where a local run and CI differ: tests skipped locally, dependencies installed locally but not on the runner, leftovers in a shared local database. A local count that matches CI's does not mean the same tests failed. Give a recipe for reproducing CI's install shape, for example a fresh worktree that links only the dependencies CI installs
 
 ### `guidelines/team-rollout.md`
 
