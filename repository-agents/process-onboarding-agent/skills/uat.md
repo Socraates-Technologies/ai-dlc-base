@@ -77,6 +77,16 @@ Revise the script if the engineer requests changes. Proceed only when the engine
 
 ### Run the Session
 
+**Prove which artifact is answering before the first step.** A UAT session validates whatever is actually serving the URL, and that is not necessarily the code under test. Before step 1, establish these and record the result in the script:
+
+- **Identify the artifact serving the URL and prove it was built from the branch under test.** Most build systems expose a build or revision id both on disk and in the served response — read both and compare them. Where no such id exists, fall back to the third check below.
+- **Name the process holding the port,** treating a shared port as the default suspicion rather than a surprise. On any machine running several checkouts, worktrees or containers, a tool reporting "server started on port N" may be reporting a server someone else started.
+- **Assert one thing that only this change renders** — a new section, a new control — as a human-readable confirmation that a build id cannot give a stakeholder.
+
+> **Why.** Nothing else in the session distinguishes the wrong artifact. The app looks right, some unrelated-seeming step fails for an unrelated-seeming reason, and every step that "passes" proves something about code the work is not in — so the session's whole output is void, and nothing in it says so.
+>
+> Worked example (Ascent, 2026-08-12): a UAT was one step from running against a **different session's build**. The tooling reported "Server started successfully on port 3001" while the process serving that port was rooted in a different checkout — which also meant its sign-in emails were being written to that checkout's log file rather than the one the tester was reading, so sign-in looked broken for a reason that had nothing to do with the change. The check that would have caught it is one command: `cat .next/BUILD_ID` in the tree under test, against the served page's own `"buildId"`.
+
 Work through the demo script one step at a time. For each step:
 
 1. Display the step clearly.
