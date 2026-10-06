@@ -100,6 +100,8 @@ Assess each of the following:
 
 **Partial rollback:** If only some units in the bolt are merged when a problem is found, can those units be reverted independently, or do they form an atomic group that must be reverted together?
 
+**Image rollback across a migration:** If any unit adds a migration, can the PREVIOUS deployed build start against the migrated schema? Answer it by reading the migration runner, not from "migrations are additive": a runner that refuses a recorded migration it has no file for makes every rollback past a migration an outage. And a rollback that has never been run is a hypothesis — say when it was last rehearsed against the real environment, or that it never has been.
+
 Produce a rollback summary:
 
 ```
