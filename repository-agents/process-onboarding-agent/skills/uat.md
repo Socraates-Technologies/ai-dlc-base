@@ -131,6 +131,14 @@ If the engineer confirms a new unit is needed, create a draft unit file at `proc
 
 Add the new unit to the Open section of the backlog.
 
+**A third route: fixed in session.** A small finding is often fixed on the spot while the engineer is still testing, which is reasonable — but an in-session fix loads no skill, so it skips every gate a bug bolt would apply. When a finding is fixed in session, apply three cheap gates and record their results in the finding row:
+
+1. **Recurrence check** — `skills/bug-bolt.md` Step 2: search retros and incidents for the same symptom.
+2. **Search for the shape, not the file** — find every other place the same logic runs (`skills/bug-bolt.md` Step 3) and record each hit as fixed, or safe and why.
+3. **A regression test seen to fail** against the unfixed code. Where the gate cannot exercise the mechanism, say so, test what it can reach, and name who verifies the rest on a real device, and when.
+
+A finding fixed in session is still recorded as a finding, with its gate results — "fixed in session" alone hides it.
+
 Proceed to Step 3 to write the sign-off to the intent file.
 
 ---

@@ -34,6 +34,12 @@ For each improvement, record one of:
 
 A prose-only improvement whose invariant *was* mechanically decidable is the failure mode this step catches.
 
+**Where the gate cannot reproduce the defect at all** — the test environment cannot exercise the mechanism (gestures, scrolling, a native or hardware path) — a behavioural test cannot see the class, and the obvious structural test is a pin on the one site that was fixed. It reads as coverage and protects only that site. The check instead:
+
+- **scans every site from source**, parsing where a regex would under-report;
+- **guards itself** — an "offenders list is empty" assertion passes trivially when the walk finds nothing, so also assert the sites the scan must reach and a floor on how many;
+- **is probed on a site its author did not write**, since generalising beyond the fixed site is the only reason it exists.
+
 ---
 
 ## Step 2 — Classify: Generic or Project-Specific

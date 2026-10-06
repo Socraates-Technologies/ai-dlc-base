@@ -19,6 +19,8 @@ Ask the engineer:
 
 Read each file in scope fully before proceeding. Do not begin analysis on partial information.
 
+If a file in scope already states what this analysis will conclude — a Definition of Done, backlog row or commit message written before the RCA ran — treat it as a hypothesis to test, not a finding. A pre-written conclusion reads as insight, and a nearly-right one is never re-examined. Artifacts that schedule an RCA should record that it is owed and why, never what it will find.
+
 ---
 
 ## Step 2 — Extract Surface Findings
@@ -103,6 +105,11 @@ Write a structured report containing:
 | **Redesign** | A design or architectural decision must change | New intent file; update `process-onboarding-agent/rules/architecture.md` with an ADR |
 | **Technology mitigation** | A technology limitation must be documented and worked around | ADR in `process-onboarding-agent/rules/architecture.md`; new intent if a replacement is warranted |
 | **Process fix** | A workflow, gate, or standard must change | Improvement file via the standard Post-Retro Improvement Workflow |
+
+For every process fix, check two things before presenting it:
+
+- **Reach.** A rule placed in a workflow skill reaches only the work that loads that skill, and the gap is invisible from inside it. List every lane that performs the act — a bug bolt, a hotfix, a fix made during UAT, a unit inside a feature bolt — and if the rule is about an *act* (fixing, committing, adding a constraint) rather than a ceremony, put its one-line form where every lane passes, such as the review checklist, and keep the detail in the workflow skill.
+- **Trigger.** A rule that fires on an observation ("when CI has been red twice…") must name who observes it and when. An observation nobody makes looks exactly like one that found nothing, so bind it to a moment that already happens — closing a unit, starting a session — and have the observation recorded there as a value.
 
 Present the report to the engineer and get explicit approval on each recommendation before creating any artifact.
 
