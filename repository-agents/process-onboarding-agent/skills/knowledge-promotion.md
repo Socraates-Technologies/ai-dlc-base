@@ -18,6 +18,8 @@ If invoked directly, ask the engineer:
 
 Read the improvement file in full before beginning the evaluation.
 
+**Evaluate every generalisation clause, not only every improvement.** The steps below run once per Applied improvement, so a rule is classified, checked and swept only if it has a row of its own. A _"the general shape is…"_ sentence written **inside** another improvement's prose has no row, and so it is never evaluated at all — and any sweep of the artefacts that predate it never reads them against it. Before Step 1.5, read each Applied improvement for a sentence that generalises beyond that improvement, and give each one an entry of its own in this batch, stated from its mechanism rather than from the improvement it sits in. _(makerclub, 2026-09-28: a "a scan over sites floors its count" clause lived as a paragraph inside a dry-run rule; the sweep had one row per improvement, so three sites predating the clause stayed unread — two of them gates, one the check that proves no secret reaches a shipped binary.)_
+
 ---
 
 ## Step 1.5 — Ask Whether the Improvement Can Be a CHECK Rather Than a Sentence
@@ -40,24 +42,24 @@ A prose-only improvement whose invariant *was* mechanically decidable is the fai
 
 For each improvement, determine whether it is **generic** (beneficial to all AI-DLC projects) or **project-specific** (only relevant to this project's stack, domain, or conventions).
 
-**Use the target file as the primary classification signal:**
+**Use the target file as the primary classification signal.** Paths below are where the files live in the project: `{FRAMEWORK_ROOT}` is the framework root set in the Preliminary Step of `repository-agents/process-onboarding-agent/onboard.md` (e.g. `docs/process/intent-execution-framework`). `setup-guide.md` and `onboard.md` have no copy in the project; they are named at their base-repo path.
 
 | Target file type | Classification |
 |---|---|
-| Any file in `process-onboarding-agent/skills/` | Generic — skills are copied verbatim into every project |
-| Any `_template.md` file in `process-onboarding-agent/ops/` | Generic — templates are shared across all projects |
-| `process-onboarding-agent/rules/engagement.md` | Generic — copied verbatim into every project |
-| `process-onboarding-agent/setup-guide.md` | Generic — the shared framework specification |
-| `process-onboarding-agent/onboard.md` | Generic — the shared onboarding protocol |
-| `process-onboarding-agent/rules/prompt-quality-gate.md` | Likely generic — evaluate content |
-| `process-onboarding-agent/rules/code-standards.md` | Project-specific — encodes the project's tech stack |
-| `process-onboarding-agent/rules/security.md` | Project-specific — unless the finding addresses a universal pattern |
-| `process-onboarding-agent/rules/architecture.md` | Project-specific — encodes project ADRs |
-| `process-onboarding-agent/guidelines/domain-glossary.md` | Project-specific |
-| `process-onboarding-agent/guidelines/edge-cases.md` | Project-specific |
-| `process-onboarding-agent/guidelines/forbidden-zones.md` | Project-specific |
-| `process-onboarding-agent/guidelines/entry-points.md` | Project-specific |
-| `process-onboarding-agent/guidelines/acceptance-patterns.md` | Likely generic — evaluate content |
+| Any file in `{FRAMEWORK_ROOT}/skills/` | Generic — skills are copied verbatim into every project |
+| Any `_template.md` file in `{FRAMEWORK_ROOT}/ops/` | Generic — templates are shared across all projects |
+| `{FRAMEWORK_ROOT}/rules/engagement.md` | Generic — copied verbatim into every project |
+| `repository-agents/process-onboarding-agent/setup-guide.md` | Generic — the shared framework specification |
+| `repository-agents/process-onboarding-agent/onboard.md` | Generic — the shared onboarding protocol |
+| `{FRAMEWORK_ROOT}/rules/prompt-quality-gate.md` | Likely generic — evaluate content |
+| `{FRAMEWORK_ROOT}/rules/code-standards.md` | Project-specific — encodes the project's tech stack |
+| `{FRAMEWORK_ROOT}/rules/security.md` | Project-specific — unless the finding addresses a universal pattern |
+| `{FRAMEWORK_ROOT}/rules/architecture.md` | Project-specific — encodes project ADRs |
+| `{FRAMEWORK_ROOT}/guidelines/domain-glossary.md` | Project-specific |
+| `{FRAMEWORK_ROOT}/guidelines/edge-cases.md` | Project-specific |
+| `{FRAMEWORK_ROOT}/guidelines/forbidden-zones.md` | Project-specific |
+| `{FRAMEWORK_ROOT}/guidelines/entry-points.md` | Project-specific |
+| `{FRAMEWORK_ROOT}/guidelines/acceptance-patterns.md` | Likely generic — evaluate content |
 | `CLAUDE.md` / `.cursorrules` / `copilot-instructions.md` | Project-specific |
 | New file being created | Evaluate by content |
 
@@ -90,24 +92,30 @@ Proceed to the next improvement.
 
 ## Step 4 — Handle Generic Improvements
 
-If the improvement is generic, determine the corresponding file in the base repository:
+If the improvement is generic, determine the corresponding file in the base repository. The base repo's framework files live under `repository-agents/process-onboarding-agent/`. Some project files have no file of their own there — they are generated during onboarding from a section of `setup-guide.md` headed with the file's path — so their change goes into that section:
 
 | Project file changed | Base repo file to change |
 |---|---|
-| `process-onboarding-agent/skills/[skill].md` | `process-onboarding-agent/skills/[skill].md` |
-| `process-onboarding-agent/ops/[path]/_template.md` | `process-onboarding-agent/ops/[path]/_template.md` |
-| `process-onboarding-agent/rules/engagement.md` | `process-onboarding-agent/rules/engagement.md` |
-| `process-onboarding-agent/rules/prompt-quality-gate.md` | `process-onboarding-agent/rules/prompt-quality-gate.md` |
-| `process-onboarding-agent/setup-guide.md` | `process-onboarding-agent/setup-guide.md` |
-| `process-onboarding-agent/onboard.md` | `process-onboarding-agent/onboard.md` |
-| New skill or guideline file | New file at the same relative path |
+| `{FRAMEWORK_ROOT}/skills/[skill].md` | `repository-agents/process-onboarding-agent/skills/[skill].md` |
+| `{FRAMEWORK_ROOT}/skills/mob-elab-prompts.md` or `review-checklist.md` | `repository-agents/process-onboarding-agent/setup-guide.md` — the section for that file (no standalone base file) |
+| `{FRAMEWORK_ROOT}/skills/unit-template.md` | `repository-agents/process-onboarding-agent/setup-guide.md` — Step 1's folder tree is its only description; a substantive change needs a new section there |
+| `{FRAMEWORK_ROOT}/ops/[path]/_template.md` | `repository-agents/process-onboarding-agent/ops/[path]/_template.md` |
+| `{FRAMEWORK_ROOT}/rules/engagement.md` | `repository-agents/process-onboarding-agent/rules/engagement.md` |
+| `{FRAMEWORK_ROOT}/rules/prompt-quality-gate.md` | `repository-agents/process-onboarding-agent/setup-guide.md` — the `rules/prompt-quality-gate.md` section (no standalone base file) |
+| `{FRAMEWORK_ROOT}/guidelines/acceptance-patterns.md` | `repository-agents/process-onboarding-agent/setup-guide.md` — the `guidelines/acceptance-patterns.md` section |
+| — (an improvement to onboarding itself) | `repository-agents/process-onboarding-agent/setup-guide.md` |
+| — (an improvement to the onboarding protocol) | `repository-agents/process-onboarding-agent/onboard.md` |
+| New skill file | New file at `repository-agents/process-onboarding-agent/skills/[skill].md` |
+| New rule or guideline file | `repository-agents/process-onboarding-agent/setup-guide.md` — a new section headed with the file's path, and an entry in Step 1's folder tree |
+
+**Open the base file at that path before drafting.** A draft written against a path that does not exist is a draft nobody can apply _(makerclub, 2026-09-23: two retros drafted against `process-onboarding-agent/…`, which this table used to name, before finding the files under `repository-agents/`)_.
 
 Draft the exact change needed in the base repo. Be precise — draft the exact text to replace and the exact replacement, the same format used in the improvement file itself:
 
 ```
 Base repo change draft
 ──────────────────────────────────────────────
-File:    [relative path in base repo]
+File:    [path in base repo, e.g. repository-agents/process-onboarding-agent/skills/…]
 
 Current text (or "New addition"):
 [exact text that exists in the base repo file, or "N/A — new addition"]
