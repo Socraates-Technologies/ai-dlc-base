@@ -157,6 +157,8 @@ Note why review does not catch this: the design is *right about everything it sa
 
 Generalises past components to any host with an admission rule: a route with a redirect gate, a menu that renders per status, a card that hides when empty.
 
+**Consuming-surface load check.** When a unit consumes another unit's or an engine's output *for display*, confirm during the design session what the target page/component actually loads — a summary projection, a full record, or a parsed/enriched form — not just the canonical output type. Pin that real input shape in the design, so the consumer's contract is decided in Phase 0 rather than widened mid-build.
+
 ---
 
 ## Step 6 — Design Sign-off and Artifact
