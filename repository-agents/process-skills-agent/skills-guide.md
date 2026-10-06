@@ -24,7 +24,7 @@ Ask the following five questions one at a time. Wait for each answer before cont
 
 3. > "What are the most common failure modes on your team — the things that go wrong repeatedly? Think about bugs, missed requirements, production incidents, or process slippage."
 
-   *Recording for:* root-cause-analysis, hotfix, dependency-audit relevance.
+   *Recording for:* root-cause-analysis, hotfix, dependency-audit relevance; architecture-review where the same code-level problem keeps recurring (duplication, drift, a module everyone avoids); disk-hygiene where builds or tooling fail on a full disk.
 
 4. > "How do you communicate progress and decisions to stakeholders — product owners, clients, or leadership?"
 
