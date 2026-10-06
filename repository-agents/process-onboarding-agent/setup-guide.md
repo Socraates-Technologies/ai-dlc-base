@@ -35,10 +35,10 @@ This guide uses the term **master rule file** to refer to the file that governs 
 | AI Tool | Master rule file | Location |
 |---|---|---|
 | **Claude Code** | `CLAUDE.md` | Repo root |
-| **Cursor** | `.cursorrules` | Repo root |
+| **Cursor** | `.cursor/rules/project-rules.mdc` | `.cursor/rules/` (with `alwaysApply: true`) |
 | **GitHub Copilot** | `copilot-instructions.md` | `.github/` folder |
 
-The content of the master rule file is identical across tools. The only differences are the file name, the location, and — for GitHub Copilot — internal links to `{FRAMEWORK_ROOT}/` files must use the prefix `../{FRAMEWORK_ROOT}/` since the file lives inside `.github/`.
+The content of the master rule file is identical across tools. The only differences are the file name, the location, and: for Cursor, the body is wrapped in a `---\nalwaysApply: true\n---` YAML frontmatter block; for GitHub Copilot, internal links to `{FRAMEWORK_ROOT}/` files must use the prefix `../{FRAMEWORK_ROOT}/` since the file lives inside `.github/`.
 
 All subsequent steps in this guide refer to the "master rule file." Substitute the correct name and path for your chosen tool.
 
@@ -294,7 +294,7 @@ Resolve all conflicts with the engineer before writing any Phase M2 files. Then 
 
 ### Phase M2 — Repository Overlay
 
-Create the governance layer on top of the existing codebase. All four artefacts must exist before the first Bolt runs.
+Create the governance layer on top of the existing codebase. All five artefacts must exist before the first Bolt runs.
 
 #### M2.1 — Master Rule File
 
@@ -332,6 +332,17 @@ Create `{FRAMEWORK_ROOT}/guidelines/entry-points.md` containing the approved lis
 #### M2.4 — Coding Conventions File
 
 Create `{FRAMEWORK_ROOT}/rules/code-standards.md` (or populate it if it already exists) entirely from the patterns extracted in M1.2. Every AI session must match the style of the existing codebase — this file is the authoritative source injected into each session.
+
+---
+
+#### M2.5 — Seed Codebase Findings
+
+Copy `_template.md` and `README.md` verbatim from `process-onboarding-agent/ops/inception/codebase-findings/` to `{FRAMEWORK_ROOT}/ops/inception/codebase-findings/`. Then, for each segment analyzed in Phase M1, create one finding file from `_template.md` (e.g. `payments-service.md`) populated from that segment's M1.1–M1.4 output:
+- **Summary** — from the segment's architecture mapping (M1.1)
+- **Findings** — one dated entry per segment, attributed to `Initial archaeology (M1)` rather than an intent slug, covering the patterns extracted (M1.2), due diligence findings (M1.3), and debt classification (M1.4)
+- **Open Questions** — anything M1 flagged with low confidence or could not resolve from code alone
+
+Add one row per segment to the index table in `README.md`. This turns the archaeology output — which would otherwise live only in this onboarding session — into the persistent starting point every future brownfield intent checks before re-analyzing the same code.
 
 ---
 
@@ -374,6 +385,7 @@ Add both forms to the master rule file Section 6 (AI-DLC Workflow) and to `{FRAM
 - [ ] `{FRAMEWORK_ROOT}/guidelines/forbidden-zones.md` created and referenced in the master rule file
 - [ ] `{FRAMEWORK_ROOT}/guidelines/entry-points.md` created
 - [ ] `{FRAMEWORK_ROOT}/rules/code-standards.md` populated from extracted patterns
+- [ ] `{FRAMEWORK_ROOT}/ops/inception/codebase-findings/` seeded with one file per M1 segment, indexed in `README.md`
 - [ ] Test coverage gate verified for first target module
 - [ ] Feature flag approach confirmed with team
 - [ ] Default AC for existing-code Bolts added to the master rule file and `code-standards.md`
@@ -448,9 +460,23 @@ Create this directory tree at the root of your repository:
   skills/
     mob-elab-prompts.md      ← interactive protocol and prompts for elaboration sessions
     review-checklist.md      ← structured lens for reviewing AI output
-    unit-template.md         ← how to write a unit (reference doc)
     compact-docs.md          ← engineer-triggered skill to archive old operational documents
     root-cause-analysis.md   ← skill to analyse incidents and improvements for design, technology, and process gaps
+    solution-shaping.md      ← decides generic-vs-specific, simplest-viable approach, and extend-vs-build-vs-buy before design begins
+    design-session.md        ← Phase 0 of elaboration — locks API contracts and data model decisions before units are proposed
+    bolt-risk-assessment.md  ← blast radius, rollback, and feature flag assessment before a bolt's first unit executes
+    progress-digest.md       ← plain-language stakeholder progress summary for a feature intent
+    uat.md                   ← acceptance testing protocol; blocks an intent from closing without sign-off
+    process-health.md        ← quantitative report on how well the AI-DLC process is functioning
+    dependency-audit.md      ← scheduled audit of third-party dependencies by severity
+    architecture-review.md   ← monthly read-only whole-codebase health review
+    disk-hygiene.md          ← scheduled workstation disk sweep; never touches unmerged work or data
+    knowledge-promotion.md   ← classifies retro improvements as generic (promote to base repo) or project-specific
+    process-visualization.md ← reconstructs how a bolt actually got delivered as Mermaid diagrams
+    new-engineer-induction.md ← walks a new team member through the project's framework
+    bug-bolt.md               ← lightweight bolt workflow for fixing a specific, reproducible bug
+    hotfix-bolt.md            ← emergency bolt for production incidents
+    nfr-bolt.md               ← non-functional quality attribute bolt (performance, security, accessibility)
   guidelines/
     domain-glossary.md       ← canonical business terms used in code and prompts
     edge-cases.md            ← known failure modes to check before generating code
@@ -465,6 +491,9 @@ Create this directory tree at the root of your repository:
         README.md
       elaborations/          ← one folder per intent; one file per session
         _template.md
+      codebase-findings/     ← one file per module/area; reverse-engineering findings from existing code, accumulated across intents
+        _template.md
+        README.md
     build/
       backlog.md             ← master status of all units
       id-reservations.md     ← id ledger: unit/bolt/intent/ADR/edge-case ids and migration numbers, each with a "Next free" marker
@@ -601,13 +630,16 @@ Then grep the backlog for owed hotfix retros (`retro + RCA due YYYY-MM-DD`) date
 5. Move to next unit. Repeat.
 6. After all units agreed, present summary table and ask for sign-off before writing any files.
 
+**Solution shaping:** at the start of every mob elaboration, check the intent for a `## Solution Shape` section. If it is absent and the intent introduces a new capability, a potentially reusable surface, or an expensive-to-reverse decision, ask the engineer once whether to run `{FRAMEWORK_ROOT}/skills/solution-shaping.md` first or proceed straight to design. The engineer decides — run it, skip it, or invoke it directly at any time; never block on it. Skip the prompt entirely for plainly small, feature-specific intents.
 **Full elaboration protocol (including design session):** read `{FRAMEWORK_ROOT}/skills/mob-elab-prompts.md` before every elaboration session. The design session runs as Phase 0 of elaboration — it is not invoked separately.
+**Codebase findings:** before analyzing existing code to understand a new intent's dependencies on prior implementation, check `{FRAMEWORK_ROOT}/ops/inception/codebase-findings/README.md` for an existing file on that module/area; after any such analysis, record or update the finding there. This is part of the mandatory elaboration protocol above, not a separate skill.
 **Bolt risk assessment:** read `{FRAMEWORK_ROOT}/skills/bolt-risk-assessment.md` after elaboration sign-off and before the first unit in a bolt executes. No unit may begin execution without a signed-off risk assessment in the bolt file.
 **UAT skill:** read `{FRAMEWORK_ROOT}/skills/uat.md` when all units under an intent are marked Done, or when the engineer invokes it directly. Prompt the engineer to run UAT before setting intent status to Implemented.
 **Progress digest skill:** read `{FRAMEWORK_ROOT}/skills/progress-digest.md` when the engineer asks for a stakeholder update, progress summary, or digest for an intent.
 **Process health skill:** read `{FRAMEWORK_ROOT}/skills/process-health.md` when the engineer invokes it to audit how well the AI-DLC process is functioning.
 **New engineer induction skill:** read `{FRAMEWORK_ROOT}/skills/new-engineer-induction.md` when an engineer says they are new to the project or invokes it directly.
 **Knowledge promotion skill:** read `{FRAMEWORK_ROOT}/skills/knowledge-promotion.md` as Step 5 of the Post-Retro Improvement Workflow after all improvements are applied. A retro is not closed until every Applied improvement has a Knowledge Promotion status.
+**Process visualization skill:** offer to read `{FRAMEWORK_ROOT}/skills/process-visualization.md` at the start of every retro, before "What Went Well" is discussed. The engineer may accept, skip, or invoke it directly at any time. Never run it without the engineer's go-ahead.
 **Dependency audit skill:** read `{FRAMEWORK_ROOT}/skills/dependency-audit.md` when the engineer invokes it, or when the `Next dependency audit` date in Section 9 has been reached. Prompt at session start if the date is due.
 **Architecture review skill:** read `{FRAMEWORK_ROOT}/skills/architecture-review.md` when the engineer invokes it, or monthly alongside the dependency audit — offer it whenever the dependency audit is prompted. Read-only: it recommends refactors, it never makes them.
 **Disk hygiene skill:** read `{FRAMEWORK_ROOT}/skills/disk-hygiene.md` when the engineer invokes it, when the `Next disk hygiene sweep` date in Section 9 has been reached, or unscheduled whenever free disk space is observed below the headroom threshold in Section 9. Prompt at session start if the date is due.
@@ -799,6 +831,11 @@ Copy this file verbatim from `process-onboarding-agent/rules/engagement.md` to `
 
 The mob elaboration reference. Must include:
 - **A census carries the command that produced it.** Where an elaboration counts something the units will be scoped against — call sites, surfaces, tables, endpoints — the plan records the command beside the number, and the bolt risk assessment re-runs that command rather than re-reading the plan. A number in a document header is read as fact by everyone downstream and re-derived by nobody, and sign-off launders it into an agreed constraint that later acceptance criteria depend on. *(Coconuts, 2026-08-25: a plan announced "18 mutation sites" over a subtotal of "10" directly above a table listing 13; it was summarised, signed off, and caught only when the risk assessment re-derived it from the tree — by which point two more sites had moved.)*
+- **Solution Shape check (before anything else):** at the very start of every elaboration session, read the intent and check for a `## Solution Shape` section. If it is missing and the intent introduces a new capability, a potentially reusable surface, or an expensive-to-reverse decision, ask the engineer once:
+
+  > "This intent has no recorded solution shape. Run Solution Shaping first (`{FRAMEWORK_ROOT}/skills/solution-shaping.md`) to decide generic-vs-specific, simplest-viable, and extend-vs-build — or proceed straight to design?"
+
+  The engineer decides: run it (then resume elaboration with the recorded shape as binding context), or proceed as-is. Never block. For plainly small, feature-specific intents, skip this prompt and go straight to mode selection.
 - **Elaboration Mode Selection:** at the very start of every elaboration session, before Phase 0, ask the engineer which mode they prefer:
 
   > "Before we begin — which elaboration mode would you like to use?
@@ -816,7 +853,8 @@ The mob elaboration reference. Must include:
 
   The quality gate, ACs, and sign-off requirements are identical in both modes — Mode B compresses the back-and-forth into a document review cycle, it does not skip any step.
 
-- **Phase 0 — Design Session:** read `{FRAMEWORK_ROOT}/skills/design-session.md` and run it at the opening of every session before proposing any units. The design session scopes the intent's API surface, data model, and architectural patterns, then produces binding constraints that govern every unit and AC in the session. For simple intents with nothing new to design, Phase 0 concludes quickly and flows straight into unit decomposition.
+- **Phase 0 — Design Session:** read `{FRAMEWORK_ROOT}/skills/design-session.md` and run it at the opening of every session before proposing any units. The design session scopes the intent's API surface, data model, and architectural patterns, then produces binding constraints that govern every unit and AC in the session. For simple intents with nothing new to design, Phase 0 concludes quickly and flows straight into unit decomposition. If the intent carries a `## Solution Shape` section (recorded by `{FRAMEWORK_ROOT}/skills/solution-shaping.md` before elaboration), Phase 0 treats those decisions as binding context and designs within them.
+- **Codebase findings check (brownfield dependency analysis):** whenever Phase 0 or unit decomposition requires understanding existing code — because the intent depends on, integrates with, or is constrained by a prior implementation — first check `{FRAMEWORK_ROOT}/ops/inception/codebase-findings/README.md` for a file already covering that module/area. If one exists, read it as a starting point and verify it still matches the current code before relying on it; findings go stale as code changes. After analyzing any module/area not yet documented there, or finding something that contradicts an existing entry, write or update the corresponding file (append a new dated entry, never overwrite prior ones) before finishing Phase 0, and update the index in `README.md`. This step is mandatory whenever code analysis of an existing module occurs — findings from reading the codebase must never live only in the session's memory.
 - **Constraint coverage per SURFACE, before the summary table.** The design's constraint list is read once, for the intent as a whole; the units are then decomposed per surface — per client, per service, per bounded context. That gap is where a signed-off constraint gets implemented in one place and silently skipped in another, and no unit's Definition of Done can see it because the defect lives strictly *between* units. Walk the constraint list once per surface the intent touches and record, for each constraint, which unit carries it there — or "does not bind here", which is a legitimate answer. **Silence is not.** A constraint with no unit on a surface it plainly governs is the finding, and catching it costs one pass over a list that already exists.
   *(Coconuts, 2026-08-25: a constraint governing a shared mixer — "the faders follow the playhead, and the song-wide level stays reachable" — was signed off, implemented on the web client the same day, and never given a mobile AC, because the mobile units were written for a narrower mode and the constraint list was never re-read per surface. Three units two days later put back what one line of a coverage pass would have caught.)*
 - **An option put to the engineer that compares to shipped behaviour carries its evidence — `file:line` in the option's own text.** An option is a claim, and the engineer answers the question they were asked: _"capped at 60 characters, like the display name"_ reads as checked and was not (the display name was capped at 30; 60 was a form's `maxlength`). Written with its source — _"like the display name (`DISPLAY_NAME_MAX = 30`, `app.ts:86`)"_ — the mismatch is visible to the writer as they type it and to the engineer as they choose. An option naming existing behaviour without a citation is, by this rule, unverified, and says so.
@@ -854,6 +892,8 @@ Structured review sections covering all five AI failure modes:
 
 Key items that must be present:
 - Feature verified in a real environment — tests passing alone is not sufficient
+- Any AC asserting a page/route is "accessible" is verified by a rendered 200 (following redirects) with the expected content actually visible — text present and legible, images decoded (non-zero natural dimensions) — never a build pass or a 3xx redirect alone
+- After any deploy, a post-deploy smoke suite passes against the live deployed URL, asserting key pages render their actual content (text visible, images decoded, primary auth/entry reachable) rather than merely returning a 200 status — a deploy is not done until this passes, and whoever is driving the deploy (the AI assistant included) runs it and reports the result rather than handing a runnable check back to the engineer
 - **Every claim that something is covered, enforced or unchanged cites the artifact that proves it — or is marked unverified.** "Asserted in a unit test", "the compiler enforces this", "the guard is untouched" are claims: name the test, paste the output, or run the check; if you cannot, write "unverified" and say what would settle it. A claim marked unverified invites the look that a believed one prevents — a false claim of coverage is often exactly why nobody inspected the seam that later failed
 - **LIST every new element the change renders, and for each say whether it is interactive and how a user knows that.** The output is the list, not a tick. Acceptable answers are things a user can SEE: a real control style, or an explicit button or label on a clickable region. "The whole card is clickable" is not one. Also flag the inverse: a non-interactive element styled like a link or button. Behavioural ACs prove a click works; nothing else asks whether anyone will click it, so without this the UAT tester is the first person to look
 - **A screen with a text field on a touch client was walked with the SOFTWARE keyboard up.** A simulator types from the host keyboard and never raises the soft one, so a walk there passes with the call-to-action hidden under the keyboard. The shared-wrapper scan catches a missing wrapper; only this walk catches a layout the wrapper does not save
@@ -917,6 +957,14 @@ Can operate on a single file or across a batch to surface cross-cutting patterns
 
 Copy this file verbatim from `process-onboarding-agent/skills/root-cause-analysis.md` to `{FRAMEWORK_ROOT}/skills/root-cause-analysis.md`. No customisation is needed.
 
+### `skills/solution-shaping.md`
+
+The solution-shaping skill runs before mob elaboration to decide the shape of the solution — generic capability or feature-specific implementation, expected usage and scale, the simplest viable approach, extend-vs-build-vs-buy, and reversibility. The signed-off decision is recorded on the intent as a `## Solution Shape` section (plus a `Shape:` header field) and inherited by the design session as binding context, so Phase 0 designs within an agreed shape rather than an open field.
+
+It runs **at the developer's discretion** — the engineer decides per intent whether to run it or go straight to elaboration, and skipping is a legitimate choice for work that doesn't need it. Invoke it on intents where the shape isn't obvious — new capabilities, candidate platform features, or requests that may be better served by extending an existing module or adopting an existing service. `mob-elab-prompts.md` **auto-prompts** for it at the start of a session when the intent has no recorded shape, but never runs it without the engineer's go-ahead — so the step is offered, not forced.
+
+Copy this file verbatim from `process-onboarding-agent/skills/solution-shaping.md` to `{FRAMEWORK_ROOT}/skills/solution-shaping.md`. No customization is needed.
+
 ### `skills/design-session.md`
 
 The design-session skill runs as Phase 0 of mob elaboration to establish an agreed design foundation — API contracts, data model sketch, and architectural pattern decisions — before any units are proposed. Mob elaboration inherits the design as binding constraints, so ACs are written against a concrete interface rather than a vague description.
@@ -963,6 +1011,12 @@ Copy this file verbatim from `process-onboarding-agent/ops/inception/dependency-
 
 The AI must read this file before planning a bolt and flag: (1) any prerequisite intent not yet Implemented, (2) any units in the planned bolt that touch a shared interface owned by a different intent.
 
+### `ops/inception/codebase-findings/`
+
+One file per module, service, or area of the existing codebase — the accumulated record of what the AI has learned by reading that code. Exists so reverse-engineering done for one intent is never repeated for the next, particularly on brownfield/mature projects where new intents routinely depend on undocumented prior implementation.
+
+Copy `_template.md` and `README.md` verbatim from `process-onboarding-agent/ops/inception/codebase-findings/` to `{FRAMEWORK_ROOT}/ops/inception/codebase-findings/`. The folder starts with only these two files — individual finding files (e.g. `payments-service.md`) are created by the AI the first time it analyzes that module, per the `mob-elab-prompts.md` protocol above. `README.md` contains the index table the AI checks before repeating any code analysis.
+
 ### `skills/new-engineer-induction.md`
 
 The new-engineer-induction skill runs when an engineer joins an AI-DLC project for the first time. It reads the project's actual master rule file, domain glossary, quality gate, and backlog — then explains each section in plain language, demonstrates the quality gate with a project-specific example, optionally runs a practice elaboration for two units, and produces a personalized quick-reference card written to `{FRAMEWORK_ROOT}/guidelines/[engineer-name-slug]-quick-ref.md`.
@@ -991,6 +1045,20 @@ Copy this file verbatim from `process-onboarding-agent/skills/knowledge-promotio
 
 ```markdown
 **Knowledge promotion skill:** read `{FRAMEWORK_ROOT}/skills/knowledge-promotion.md` as Step 5 of the Post-Retro Improvement Workflow, after all improvements are applied. A retro is not closed until every Applied improvement has a Knowledge Promotion status.
+```
+
+### `skills/process-visualization.md`
+
+The process-visualization skill reconstructs how a bolt (or a whole intent) actually got delivered and renders it as Mermaid diagrams — an actual delivery timeline (`gantt`) and an actual execution path (`flowchart`) — plus a plan-vs-actual deviation table comparing the bolt's recorded `Execution Order` against what really happened. When the project is a git repository, it mines commit history for each unit and bolt file to find the real dates a `Status:` field changed; otherwise it falls back to the dates already recorded in the artifacts and says so plainly.
+
+Offered at the start of every retro, before "What Went Well" is discussed, the same way `solution-shaping.md` is offered before design sessions — the engineer accepts, skips, or runs it later. Output is written into the retro file's "Delivery Flow (What Actually Happened)" section, so the rest of the retro discussion has a factual anchor instead of relying on memory. It complements the retro's Round Trips section: that records what one surface cost; this shows where the whole bolt's time went.
+
+Copy this file verbatim from `process-onboarding-agent/skills/process-visualization.md` to `{FRAMEWORK_ROOT}/skills/process-visualization.md`. No customization is needed.
+
+**Wire into the master rule file Section 6** by adding one routing line:
+
+```markdown
+**Process visualization skill:** offer to read `{FRAMEWORK_ROOT}/skills/process-visualization.md` at the start of every retro, before "What Went Well" is discussed. The engineer may accept, skip, or invoke it directly at any time. Never run it without the engineer's go-ahead.
 ```
 
 ### `skills/dependency-audit.md`
@@ -1228,7 +1296,7 @@ Fields: Status, Goal, Start/Target/Completed dates, Units table, Execution Order
 The id ledger: one table per id family (units, bolts, intents, ADRs, edge cases, migration numbers), each row a claimed id with the file or artifact that holds it and the commit that claimed it, and a **"Next free"** marker per table. Nothing is numbered from this file at planning time — work is written under placeholders (`U-TBD`, `B-TBD`, `ADR-TBD`, `NNNN_name`) and the ledger is read, advanced and committed in the push cycle described in `guidelines/dev-setup.md` and the master rule file Section 6. Copy the base file verbatim; it starts with every marker at its first value.
 
 ### `ops/operate/retros/_template.md`
-Sections: What Went Well, What Didn't Go Well, Round Trips (how many hand verifications and builds one surface took, and what each bought), AI-Specific Observations (prompts that worked / needed revision / quality gate failures / output accepted without enough review), Actions table, Improvements Triggered (**required** — cannot be left blank without a stated reason), New Intents Triggered, Post-Retro Improvement Workflow.
+Sections: Delivery Flow (What Actually Happened — populated by the process-visualization skill when the engineer accepts the offer at retro start), What Went Well, What Didn't Go Well, Round Trips (how many hand verifications and builds one surface took, and what each bought), AI-Specific Observations (prompts that worked / needed revision / quality gate failures / output accepted without enough review), Actions table, Improvements Triggered (**required** — cannot be left blank without a stated reason), New Intents Triggered, Post-Retro Improvement Workflow.
 
 **The Post-Retro Improvement Workflow is mandatory and AI-driven.** Immediately after the retro document is complete, the AI must:
 1. Synthesize every finding in "What Went Well" (a discipline the next session would need), "What Didn't Go Well", "Round Trips" and "AI-Specific Observations" into concrete improvement proposals — one per finding — identifying the exact file and text to change
@@ -1254,7 +1322,7 @@ This is the main onboarding document for every engineer. Sections:
 5. Phase 2 — Build (bolts, unit execution order, review before merge)
 6. Phase 3 — Operate (retros, incidents, improvements)
 7. The Three Non-Negotiables (quality gate, review checklist, prompt log)
-8. Using a different AI tool (Cursor → `.cursorrules`; GitHub Copilot → `.github/copilot-instructions.md`)
+8. Using a different AI tool (Cursor → `.cursor/rules/project-rules.mdc`; GitHub Copilot → `.github/copilot-instructions.md`)
 9. Common mistakes table
 10. Quick reference table (ceremony → what to say to the AI)
 
@@ -1269,18 +1337,20 @@ By this point your master rule file should exist at the correct path for your ch
 | Tool | Expected path | Loaded automatically? |
 |---|---|---|
 | Claude Code | `CLAUDE.md` at repo root | Yes — every session |
-| Cursor | `.cursorrules` at repo root | Yes — every session |
+| Cursor | `.cursor/rules/project-rules.mdc` (with `alwaysApply: true`) | Yes — every session |
 | GitHub Copilot | `.github/copilot-instructions.md` | Yes — every session |
 
 ### Supporting multiple tools in the same repo
 
-If your team uses more than one AI tool, create copies of the master rule file for each additional tool. The content is identical — only the file name, location, and internal link prefixes differ.
+If your team uses more than one AI tool, create copies of the master rule file for each additional tool. The content is identical — only the file name, location, internal link prefixes, and (for Cursor) a wrapping YAML frontmatter block differ.
 
 **Add Cursor support** (if your primary tool is Claude Code or Copilot):
 ```bash
-cp CLAUDE.md .cursorrules
+mkdir -p .cursor/rules
+printf -- '---\nalwaysApply: true\n---\n\n' > .cursor/rules/project-rules.mdc
+cat CLAUDE.md >> .cursor/rules/project-rules.mdc
 ```
-Open `.cursorrules` and update the opening line to reference Cursor.
+Open `.cursor/rules/project-rules.mdc` and, in the copied content below the `---` frontmatter block, update the opening line to reference Cursor.
 
 **Add GitHub Copilot support** (if your primary tool is Claude Code or Cursor):
 ```bash
@@ -1291,7 +1361,10 @@ Open `.github/copilot-instructions.md`, update the opening line to reference Git
 
 **Add Claude Code support** (if your primary tool is Cursor or Copilot):
 ```bash
-cp .cursorrules CLAUDE.md   # or copy from .github/copilot-instructions.md
+# From Cursor rule file — strip the YAML frontmatter before copying:
+tail -n +5 .cursor/rules/project-rules.mdc > CLAUDE.md
+# Or from Copilot:
+# cp .github/copilot-instructions.md CLAUDE.md
 ```
 Open `CLAUDE.md`, update the opening line to reference Claude Code, and if copying from Copilot change all `../{FRAMEWORK_ROOT}/` prefixes back to `{FRAMEWORK_ROOT}/`.
 
@@ -1333,7 +1406,7 @@ A table of every file written during onboarding, grouped by folder.
 
 | File | Status | Notes |
 |---|---|---|
-| `CLAUDE.md` (or tool equivalent) | Created | Sections 1–8 populated |
+| `CLAUDE.md` (or tool equivalent) | Created | Sections 1–9 populated |
 | `{FRAMEWORK_ROOT}/rules/...` | Created | … |
 | *(etc.)* | | |
 
@@ -1379,11 +1452,11 @@ This is the final and mandatory step. After the report is presented, the agent m
 
 **Framework files**
 - [ ] Folder structure created (`{FRAMEWORK_ROOT}/` tree from Step 1)
-- [ ] Master rule file written with all 8 sections (Step 2)
+- [ ] Master rule file written with all 9 sections (Step 2)
 - [ ] `rules/` files written (prompt-quality-gate, code-standards, security, architecture)
 - [ ] `skills/` files written (mob-elab-prompts, review-checklist)
 - [ ] `guidelines/` files written (domain-glossary, edge-cases, acceptance-patterns, dev-setup)
-- [ ] Ops templates written (intent, unit, bolt, retro, incident, improvement)
+- [ ] Ops templates written (intent, unit, bolt, retro, incident, improvement, codebase-findings)
 - [ ] `Instructions2FDE.md` written
 - [ ] `{FRAMEWORK_ROOT}/README.md` written
 

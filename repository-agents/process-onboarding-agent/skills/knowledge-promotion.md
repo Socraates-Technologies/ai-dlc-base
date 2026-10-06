@@ -86,7 +86,7 @@ For each improvement, determine whether it is **generic** (beneficial to all AI-
 | `{FRAMEWORK_ROOT}/guidelines/forbidden-zones.md` | Project-specific |
 | `{FRAMEWORK_ROOT}/guidelines/entry-points.md` | Project-specific |
 | `{FRAMEWORK_ROOT}/guidelines/acceptance-patterns.md` | Likely generic — evaluate content |
-| `CLAUDE.md` / `.cursorrules` / `copilot-instructions.md` | Project-specific |
+| `CLAUDE.md` / `.cursor/rules/project-rules.mdc` (or any `.mdc` under `.cursor/rules/`) / `.cursorrules` (legacy) / `copilot-instructions.md` | Project-specific |
 | New file being created | Evaluate by content |
 
 **For ambiguous cases, apply the content test:**
@@ -137,7 +137,6 @@ If the improvement is generic, determine the corresponding file in the base repo
 |---|---|
 | `{FRAMEWORK_ROOT}/skills/[skill].md` | `repository-agents/process-onboarding-agent/skills/[skill].md` |
 | `{FRAMEWORK_ROOT}/skills/mob-elab-prompts.md` or `review-checklist.md` | `repository-agents/process-onboarding-agent/setup-guide.md` — the section for that file (no standalone base file) |
-| `{FRAMEWORK_ROOT}/skills/unit-template.md` | `repository-agents/process-onboarding-agent/setup-guide.md` — Step 1's folder tree is its only description; a substantive change needs a new section there |
 | `{FRAMEWORK_ROOT}/ops/[path]/_template.md` | `repository-agents/process-onboarding-agent/ops/[path]/_template.md` |
 | `{FRAMEWORK_ROOT}/rules/engagement.md` | `repository-agents/process-onboarding-agent/rules/engagement.md` |
 | `{FRAMEWORK_ROOT}/rules/prompt-quality-gate.md` | `repository-agents/process-onboarding-agent/setup-guide.md` — the `rules/prompt-quality-gate.md` section (no standalone base file) |

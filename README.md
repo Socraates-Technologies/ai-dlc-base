@@ -27,15 +27,17 @@ Rules, skills, and guidelines are generated through conversation with your team 
 
 ## Supported AI Tools
 
-AI-DLC works with any of the three AI coding assistants below. The framework content is identical across all three — only the master rule file name and location differ.
+AI-DLC works with any of the three AI coding assistants below. The framework content is identical across all three — only the master rule file name, location, and (for Cursor and GitHub Copilot) a small tool-specific wrapper differ.
 
 | AI Tool | Master rule file | Location in project repo |
 |---|---|---|
 | **Claude Code** | `CLAUDE.md` | Repo root |
-| **Cursor** | `.cursorrules` | Repo root |
+| **Cursor** | `.cursor/rules/project-rules.mdc` | `.cursor/rules/` (with `alwaysApply: true` frontmatter) |
 | **GitHub Copilot** | `copilot-instructions.md` | `.github/` folder |
 
 Each tool loads its master rule file automatically at the start of every session.
+
+> **This table describes what the onboarding agent generates in a *consumer* project.** `ai-dlc-base` has its own master rule files — `CLAUDE.md`, `.cursor/rules/ai-dlc-base-governance.mdc` and `.github/copilot-instructions.md` — which govern work on this repo itself and route an assistant to [RULES.md](RULES.md) and [pr-review.md](pr-review.md). They are not the template; the template is specified in the setup guide.
 
 ---
 
@@ -121,6 +123,7 @@ Works with any project — no AI-DLC installation required. → [Full diagnostic
 - [Incremental adoption activities](readme-content/incremental-adoption.md) — Phase 1–3 activities for teams not ready to fully onboard
 - [Migrating from the old structure](readme-content/migrating-from-old-structure.md) — from `ai-dlc/` to the new methodology
 - [Contributing improvements back](readme-content/contributing.md) — how the base repo evolves through knowledge promotion
+- [Repository integrity rules](RULES.md) — the cross-reference "Sync Sets" that must move together when editing this repo, and the PR-review skill ([pr-review.md](pr-review.md)) that checks them
 - [Estimation guide](readme-content/estimation.md) — ballpark and delivery estimation modes, tier classifications, calibration from recorded hours
 
 ---

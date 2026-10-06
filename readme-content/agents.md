@@ -69,7 +69,7 @@ The output is a fully configured `intent-execution-framework/` folder (placed in
 
 The experience agent compounds in quality over time — every retro tightens the rules, every RCA surfaces deeper gaps, knowledge promotion propagates improvements across teams, and every bolt is safer than the last.
 
-**Entry point:** The master rule file at the repo root (`CLAUDE.md`, `.cursorrules`, or `.github/copilot-instructions.md`)
+**Entry point:** The master rule file at the repo root (`CLAUDE.md`, `.cursor/rules/project-rules.mdc` (or any `.mdc` under `.cursor/rules/`), `.cursorrules` (legacy), or `.github/copilot-instructions.md`)
 
 ---
 
@@ -119,7 +119,7 @@ The output is a comprehensive Review Report containing: a domain-by-domain score
 
 **How it works:**
 - Runs a five-question discovery interview about the team's current process, AI touchpoints, common failure modes, stakeholder communication, and capability gaps
-- Presents the full skills catalogue (15 skills grouped by delivery moment) with a dependency classification for each: **Standalone** (invoke directly), **Needs config** (one small configuration at invocation), or **Framework-only** (requires the full framework)
+- Presents the full skills catalogue (17 skills grouped by delivery moment) with a dependency classification for each: **Standalone** (invoke directly), **Needs config** (one small configuration at invocation), or **Framework-only** (requires the full framework)
 - Flags skills most relevant to the team's answers with a ★ Recommended marker
 - Engineer selects skills; agent warns before installing any Framework-only skills
 - Copies selected skill files to the team's chosen path
