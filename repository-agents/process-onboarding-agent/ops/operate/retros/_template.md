@@ -20,6 +20,12 @@
 
 ---
 
+## Round Trips
+
+How many times did the engineer verify the same surface by hand for this bolt, and how many builds or deploys did that take? [N verifications / M builds]. If more than two, say what each round trip bought and whether a redesign would have been cheaper than the sequence — a run of individually correct fixes has no single finding to hang on, so its cost is otherwise absorbed unrecorded.
+
+---
+
 ## AI-Specific Observations
 
 **Prompts that worked well:**
@@ -37,6 +43,8 @@
 ---
 
 ## Actions
+
+Every action this retro hands on gets a backlog row in the same commit as the retro — nothing reopens a retro, and the backlog is what sessions read. An action discharged before the retro closes needs no row; say so in its Status.
 
 | # | Action | Owner | Target date | Status |
 |---|---|---|---|---|
@@ -68,11 +76,13 @@
 
 ### Step 1 — Synthesise findings into improvement proposals
 
-Read every entry in "What Didn't Go Well", "AI-Specific Observations", and "Actions". For each finding that points to a fixable rule, skill, or guideline, draft one improvement proposal covering:
+Read every entry in "What Went Well", "What Didn't Go Well", "Round Trips", "AI-Specific Observations", and "Actions". For each finding that points to a fixable rule, skill, or guideline, draft one improvement proposal covering:
 - Which file needs to change (`process-onboarding-agent/rules/`, `process-onboarding-agent/skills/`, `process-onboarding-agent/guidelines/`, or the master rule file)
 - The exact current text to replace (or "new addition" if nothing exists yet)
 - The exact proposed replacement text
 - Why the change prevents the finding from recurring
+
+Of each "What Went Well" entry, ask: *is this a discipline the next session would need and could not find?* Most successes are not improvements; the ones that are exist nowhere else. A session that hits a wall records it under "What Didn't Go Well" and is collected; a session that invents a technique and uses it successfully records it under "What Went Well" — so skipping that section loses the best sessions' lessons first.
 
 Present all proposals to the engineer as a numbered list — one proposal per finding — before creating any files.
 

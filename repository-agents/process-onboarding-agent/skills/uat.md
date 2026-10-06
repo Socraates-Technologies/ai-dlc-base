@@ -44,6 +44,7 @@ Translate the collected ACs into a numbered plain-language demo script. Apply th
 - Use the stakeholder's vocabulary from the intent's "What" and "Success Looks Like" sections — not engineering terms
 - Group related ACs into logical user journeys rather than listing them unit by unit
 - If two ACs describe the same user action with different outcomes (happy path and error path), combine them into one step with two expected outcomes
+- **A design decision's accepted cost is a step.** Read the intent's design decisions as well as its ACs. Where a decision records a case it deliberately does not serve (e.g. "a record added by mistake can only be archived, not deleted"), write a step that puts the tester in exactly that case, with the design's answer as the expected outcome. A deliberate absence produces no AC and so no step; UAT is the first time anyone meets the cost a document priced. A pass on such a step records that the cost was met and accepted
 - Never mention unit names, AC numbers, Given/When/Then syntax, or technical implementation details in the demo script
 
 Present the demo script to the engineer before the session begins:
@@ -114,6 +115,8 @@ Work through the demo script one step at a time. For each step:
 > Worked example (Ascent, 2026-08-02): the final step of an MFA intent — *an un-enrolled user on a policy-bound company cannot reach the app* — was reported **Pass** while the database showed a pending credential, zero recovery codes, and no enrolment log line. The same evidence allowed two readings: a **fail-open defect in the sign-in gate**, or an unfinished step. It was the latter, and the step passed cleanly on a re-run — but recording the reported Pass would have closed the intent with its most security-critical assertion untested.
 >
 > Note the incentive this corrects: an agent that wrote the code has every reason to accept a Pass and move on. Requiring the trace makes accepting a false Pass **more work than checking**, which is the only kind of safeguard that survives a long session.
+
+**A step reached through the API is not a verified step.** When a scripted or automated pass creates state that the step expects the *interface* to create, record that against the step ("set up via the API; the UI path was not exercised") rather than marking it Pass, never call the journey verified, and log it as a finding. Setup through the API reaches around a missing surface without noticing the surface is missing — a step the interface cannot perform is either a defect or a script describing a feature nobody built.
 
 Do not ask for more than one step at a time.
 

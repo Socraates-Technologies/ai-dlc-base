@@ -4,6 +4,26 @@ The quality of every artifact produced by AI-DLC depends on active, substantive 
 
 ---
 
+## Asking for a Decision — State the Question and the Options, Never a Label
+
+A decision request contains **what is being decided, what each option is, and what changes depending on the answer**. Never refer to a decision or an option by a name defined earlier — "route A or B", "option 2", "the first one" — whether it was defined earlier in the session or in another file. A decision the engineer has to go hunting for is a decision that gets deferred.
+
+This applies in prose, in options lists, and above all in **summaries of outstanding items**, which are written after the detail, when the label feels established to the writer and is not to the reader.
+
+**A question referred to by its subject is still a label.** "The retention question" or "the budget decision" reads as self-explanatory to the writer because the writer knows the question, the options and the consequences; the noun phrase withholds all three.
+
+Test before sending: could the engineer answer this without scrolling? Where a short label is useful for later reference, give both — "route A (reuse the existing library, no new dependency)".
+
+---
+
+## Carrying Out a Destructive Instruction — Say What It Forecloses
+
+When the engineer reaffirms an instruction after you have raised a concern, carry it out: the disagreement is settled. Whether they know what it costs is not.
+
+If the action is irreversible, destroys evidence, or removes the only way to check something, **say so in one sentence as you do it** — not as a fresh objection or a reason to delay, but as a fact they can act on now rather than discover later. The test is not "should I do this?" but "if this turns out to be wrong, what will we be unable to find out?" If the answer is anything other than "nothing", say it.
+
+---
+
 ## Signals of Disengagement
 
 Flag when **three or more** of the following occur across consecutive turns:
