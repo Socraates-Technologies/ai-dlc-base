@@ -22,6 +22,16 @@
 
 ---
 
+## AC → test traceability
+
+> Written at unit completion, not at closeout. One row per AC; a row may cover several (`AC1/AC4 — …`). An AC with **no** test is a legitimate row: say so and why. A **missing** row is the defect this table exists to catch. A green suite says nothing about the ACs it never covered, and a DoD tick cannot have a missing row.
+
+| AC | Named test |
+|---|---|
+| AC1 | |
+
+---
+
 ## Scope
 
 **In scope:**
@@ -47,9 +57,11 @@
 Before generating code for this unit, the agent must run these checks:
 
 - [ ] Grep for existing implementations of [pattern] across the codebase to avoid duplication
+- [ ] Before adding a lookup table, enum→value map or threshold constant that another module may already need, grep for its VALUES, not its name — copies rarely share the original's identifier. If copies exist, extract one home and point every existing copy at it in this change: identical values make the behavioural risk nil, and the existing suites are the proof. Deferring it schedules a divergence. *(A shared map was found duplicated twice, with identical values under different names, only when a third consumer needed it.)*
 - [ ] Confirm the module entry point is listed in `process-onboarding-agent/guidelines/entry-points.md`
 - [ ] Confirm no files in scope appear in `process-onboarding-agent/guidelines/forbidden-zones.md`
 - [ ] Verify test coverage for affected module meets the gate threshold
+- [ ] If this unit executes inside a multi-unit bolt: scan the decisions landed since the bolt's risk assessment was signed off (the history of the ADR log and the business-decision log) and re-read any that touch this unit's assumptions — the assessment captured the decisions known when it was written, and concurrent sessions land decisions continuously
 - [ ] Confirm everything an AC relies on exists where the AC's code runs — each client function it calls, each control it taps, each named constant or limit it quotes. A server capability is not a client control, and a constant on one side is not available on the other: if absent, the unit is bigger than written, or the AC records whether the value is imported, duplicated with its source named, or asked of the server
 - [ ] Where an AC adds a second instance of a pattern already on the screen ("as X already does"), write the new labels into the AC and confirm they differ from the existing ones *(identical labels break existing text queries and invite a mis-tap)*
 - [ ] List the design premises and binding-constraint titles that touch this unit's files, each marked **kept** or **departed**; put any departure to the engineer before code *(a premise no AC restates is otherwise checked by nothing)*
@@ -100,7 +112,7 @@ Before generating code for this unit, the agent must run these checks:
 
 ## Definition of Done
 
-- [ ] All ACs implemented and traceable to code
+- [ ] The AC → test table above is complete: every AC has a row
 - [ ] Any recorded **deviation from an AC** names the case that distinguishes it from the AC as written, and either shows that case impossible or accepts it. A written deviation reads as a decision somebody made, which is what makes a wrong one expensive. _(makerclub, 2026-09-21: "three resets in 60 s" was implemented as "three crashes, none reaching 5 s of life" and called stricter; a program crashing at eight seconds cleared its own count every boot and looped for ever.)_
 - [ ] Unit tests written for each AC
 - [ ] Any procedure this unit writes that DELETES or REPLACES data (a restore, a wipe, a migration rollback, a cleanup job) has been rehearsed in this unit, and the rehearsal is recorded with its date and its result — including a first attempt that failed. A procedure is a hypothesis until it has been run
@@ -123,6 +135,7 @@ Before generating code for this unit, the agent must run these checks:
 - [ ] Reviewed against `process-onboarding-agent/skills/review-checklist.md`
 - [ ] Prompt log updated in `process-onboarding-agent/prompts/`
 - [ ] Anything this unit leaves **owed** — a device observation, a step only a named person can take, a question awaiting a ruling — has its own row in the backlog, naming who owes it and what would close it *(a mention inside this file or a status cell is not a row: after the unit closes, nobody reopens this file, and the backlog is what gets read)*
+- [ ] No box above is blank, or noted "pending", when the status is set to Done — each is ticked with the evidence that satisfies it, or replaced by an explicit, reasoned deferral naming who carries it. For a unit that renders a page or component, the evidence is either a passing automated UI test or the recorded observation required above; "pending" is neither, and the unit stays In Progress *(a blank box reads as a skipped check: work done but unrecorded becomes indistinguishable from work never done, and a unit called "functionally complete" with its verification pending reads as Done)*
 - [ ] Unit status set to Done in backlog
 
 ---
