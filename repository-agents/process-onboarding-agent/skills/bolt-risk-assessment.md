@@ -185,6 +185,8 @@ The gate fires twice: no unit executes without a signed assessment, and nothing 
 
 A decision at sign-off that withdraws or replaces a mechanism is a re-plan: search the bolt's units for the withdrawn mechanism and amend each affected Context and AC in the same commit as the assessment. A note beside a stale AC is not an amendment — the AC is what gets built.
 
+Read one bolt ahead. If this bolt's decisions withdraw or rename anything, grep the next bolt's units for it too: a unit that still names the withdrawn mechanism looks fine until that bolt is next, and a grep now costs seconds while the context is still held.
+
 ---
 
 ## Step 7 — Write to the Bolt File
