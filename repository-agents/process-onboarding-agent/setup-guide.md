@@ -585,7 +585,7 @@ Then read the `Next dependency audit` date from Section 9. If today is on or aft
 > "A dependency and security audit is scheduled. Would you like to run it now, or set a new date?"
 If the engineer defers, ask for the new date and update Section 9 before continuing.
 
-Then read the `Next disk hygiene sweep` date from Section 9 and apply the same rule. Also run the sweep unscheduled whenever free disk space is observed below [headroom threshold].
+Then read the `Next disk hygiene sweep` date from Section 9 and apply the same rule. Also run the sweep unscheduled whenever free disk space is observed below the headroom threshold in Section 9.
 
 Then count the improvement files in `{FRAMEWORK_ROOT}/ops/operate/improvements/` whose Status is `Open` (excluding `_template.md`) and report them in three lines, never the full list:
 > "**N improvement proposals are Open, the oldest from YYYY-MM-DD.** Three to decide: [expired ones first — past their `Decide by` date — then the oldest]. Would you like to decide any of them now?"
