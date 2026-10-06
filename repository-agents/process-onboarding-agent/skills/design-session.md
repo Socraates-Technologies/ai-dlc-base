@@ -117,6 +117,7 @@ After each endpoint, ask:
 > "Which filter or option does its API offer to narrow that list to what the thing can actually be — and are we passing it?"
 
 *(makerclub, 2026-10-05: the handoff drew a serial-port picker holding the dev kit alone; the browser listed seven ports, six of them Bluetooth speakers, and the engineer's first walk asked for the filter the API had offered all along.)*
+**Named-act check:** A contract line describing something a person chose, selected, approved or confirmed must name the surface where that happens, or say it is out of scope and which unit owns it. A noun with no referent passes "every AC is testable", because each reader supplies the missing mechanism from their own head.
 
 ---
 
@@ -185,6 +186,7 @@ A scaling behaviour, a retention window, a quota, a protocol version, a tool's c
 about somebody else's system, and it can be wrong on the day it is written or become wrong later. An undated
 mechanism is a belief, and beliefs are what the next unit builds on. If the claim was not checked, the ADR
 says so, and checking it is the first thing the unit that depends on it does.
+Write a trade-off that leaves a case deliberately unserved as the exact user action that meets it, so UAT can turn it into a step.
 
 Write confirmed ADRs to `process-onboarding-agent/rules/architecture.md` before moving to the next pattern.
 
