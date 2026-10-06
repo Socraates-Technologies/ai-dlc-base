@@ -91,7 +91,7 @@ For each **approved** improvement, check whether any currently open units or pla
 
    > "Before I apply this change, [N] open units reference the section being modified: [unit names]. Their pre-generation checks or ACs may need updating after the improvement is applied. Do you want me to flag these units for review once the change is made?"
 
-5. Record the impact list in the improvement file under **Affected open units** (see improvement template). If no open units are affected, record "None."
+5. Record the impact list in the improvement file under **Affected open units** (see improvement template). If no open units are affected, record "None." **And add one line to each affected bolt's file, under its risk assessment: the improvement's link and what to re-read.** The improvement file is read by whoever applies the rule; the bolt file is read by whoever executes the bolt. A flag written only into the improvement reaches the first and never the second.
 
 Do not proceed to Step 3 until the engineer has acknowledged the impact list.
 

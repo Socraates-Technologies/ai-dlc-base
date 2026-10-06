@@ -90,11 +90,16 @@ Before generating code for this unit, the agent must run these checks:
 
 - [ ] All ACs implemented and traceable to code
 - [ ] Unit tests written for each AC
+- [ ] Any procedure this unit writes that DELETES or REPLACES data (a restore, a wipe, a migration rollback, a cleanup job) has been rehearsed in this unit, and the rehearsal is recorded with its date and its result — including a first attempt that failed. A procedure is a hypothesis until it has been run
+- [ ] If this is the last unit of the last bolt of an intent: the intent's own file is closed in the same commit — its status set, what is Owed listed, and what would reopen it stated
 - [ ] Integration tests for affected module pass without modification *(or: all breaking changes listed in the Breaking Changes Register have updated tests and are approved)*
+- [ ] Any failure in the full run that is not this unit's and does not reproduce is recorded as one line — date, suite and test, the error's first line, elapsed time — on the backlog's open row for intermittent failures (or a new row if none fits) *(a single sighting is a data point, and an intermittent class is made only of single sightings; left in this unit, nobody who later diagnoses it will see it)*
 - [ ] No secrets or hardcoded environment values
 - [ ] Auth checked on every new endpoint
+- [ ] Any AC whose behaviour the test gate cannot reach (a device, a real network, a person's screen) is Done only against an observation recorded in this unit — date, build or commit, what was done, what was seen. **Where the behaviour is a delivery** (something reaching a person: a message, a notification, a screen state, a file on a device) **the observation is taken at the receiving end**, or from the server's record of the delivered item — never from the sender's own log, which records the attempt whatever happened to it
 - [ ] Reviewed against `process-onboarding-agent/skills/review-checklist.md`
 - [ ] Prompt log updated in `process-onboarding-agent/prompts/`
+- [ ] Anything this unit leaves **owed** — a device observation, a step only a named person can take, a question awaiting a ruling — has its own row in the backlog, naming who owes it and what would close it *(a mention inside this file or a status cell is not a row: after the unit closes, nobody reopens this file, and the backlog is what gets read)*
 - [ ] Unit status set to Done in backlog
 
 ---
