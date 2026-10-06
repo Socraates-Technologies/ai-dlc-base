@@ -149,7 +149,14 @@ If the engineer confirms an ADR, draft it immediately and present it for confirm
 **Decision:** [what was decided]
 **Why:** [the reasoning]
 **Trade-off:** [what you gave up]
+**Vendor claims:** [each thing a vendor is relied on to do, with the date it was checked — or "none"]
 ```
+
+**An ADR that names what a VENDOR will do carries the date that was checked, exactly like a version pin.**
+A scaling behaviour, a retention window, a quota, a protocol version, a tool's compatibility: each is a claim
+about somebody else's system, and it can be wrong on the day it is written or become wrong later. An undated
+mechanism is a belief, and beliefs are what the next unit builds on. If the claim was not checked, the ADR
+says so, and checking it is the first thing the unit that depends on it does.
 
 Write a trade-off that leaves a case deliberately unserved as the exact user action that meets it, so UAT can turn it into a step.
 
@@ -158,6 +165,20 @@ Write confirmed ADRs to `process-onboarding-agent/rules/architecture.md` before 
 After each pattern, ask:
 
 > "Is there another pattern to document, or is this step complete?"
+
+---
+
+## Step 5.5 — Where new code will LIVE, and what its host already decides
+
+Before sign-off, any part of the design that says **where** new code goes gets two checks. The first is ordinary: a location claim is a claim about the tree, so verify it — who already imports the module you named, and does the codebase have a convention for this kind of thing? A location claim reads as incidental detail, so it **inherits the credibility of the verified sections beside it** and nobody checks it. Where a location cannot be verified in the session, mark it provisional and say the executing unit decides it — an unmarked wrong location is followed.
+
+The second is the one designs miss. **When the location is INSIDE an existing component, read that component's own render conditions — its early returns, its guards, the props it keys them on.** The first check asks whether the module can legally host the code. This asks a different question, one altitude up: *for which states does the host render at all?* A component is not a neutral container — it already decided who it appears for, and a new control inherits that decision silently.
+
+Worked example (Ascent, 2026-08-12), a near-miss caught only because implementation looked. A design placed a "Remove" control inside an existing per-row controls component, correctly naming the file, its props and its client/server status. That component opens `if (!canResendInvite && !canRevokeAccess) return null` — and **both are false for a person with no platform access**, which is precisely the most removable kind of record (a test entry, a duplicate from an import). Following the design as written would have shipped a control that appeared for every row EXCEPT the ones it existed for, and a test written against the obvious fixture would have passed.
+
+Note why review does not catch this: the design is *right about everything it says*. Nothing in "add a Remove control to `<Component>`, which takes `{id, status}` and is already permission-gated" is false. The omission is a fact about the host that the design never had a slot for. So the check is mechanical — **quote the host's guard conditions into the design, and state which of them the new affordance needs changed** — and where the answer is "none", say so, because "the early return is unchanged" is a claim worth having on the record.
+
+Generalises past components to any host with an admission rule: a route with a redirect gate, a menu that renders per status, a card that hides when empty.
 
 ---
 
@@ -180,6 +201,9 @@ Provisional:     [anything marked unsure, or "none"]
 
 Shall I record this as the design artifact and move to unit decomposition?
 ```
+
+**A number written into the design artifact is computed by a command, and the command is kept beside it.** A count, a distance, a ratio — anything the artifact states as measured — reads as measured whether or not it was, and the next reader reasons from it. Keep the one-liner that produced it next to it, so it is re-run rather than trusted.
+*(makerclub, 2026-09-24: a design's values review said "17 have a token" and "within 6/255 of every tint" beside a scripted extraction; the numbers themselves were made in the head, and were 18 and 8.)*
 
 If the engineer confirms, create the design artifact at `process-onboarding-agent/ops/inception/designs/YYYY-MM-DD-<unix_timestamp>-[intent-slug]-design.md` and link it from the intent file under a `Design:` field in the intent header.
 
@@ -246,6 +270,14 @@ ACs must not contradict them. Surface any conflict before writing a unit — do 
 
 - [one binding decision per bullet]
 ```
+
+**A constraint about USER-FACING COPY is written against the copy that already exists on the adjacent surfaces — never against the principle alone.** A copy rule derived from a doctrine reads as rigorous and can forbid the product's own best sentence, because the doctrine is about meaning and the constraint gets written about words.
+
+Worked example (Ascent, 2026-08-12). An ADR recorded that withdrawing a document destroys nothing, and that *"the surface copy must say so plainly, or a user may believe they destroyed a file they did not."* The constraint written from it became **"the word *delete* appears nowhere"**, which travelled into the design, the plan and an AC and was reviewed three times. A sibling dialog two tabs away says **"nothing is deleted"** — the exact denial the ADR asks for, and a phrase the constraint forbade. It took *writing the copy* to notice, and the AC had to be amended mid-execution.
+
+So: before writing a copy constraint, **grep the adjacent surfaces for the phrase you are about to rule on** and quote what you find into the constraint. Then state the rule as a claim about MEANING with the mechanism named — "must not assert deletion, and must state the denial explicitly, as `<sibling surface>` already does" — rather than as a banned token. A constraint phrased as a word ban is testable and wrong; one phrased as a claim needs a slightly cleverer guard and is right.
+
+The general form: **a rule about one fact, written twice from different starting points, will eventually contradict itself.** The surfaces are the source of truth for how a product says a thing; the ADR is the source of truth for what must be true.
 
 ---
 

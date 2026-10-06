@@ -75,7 +75,30 @@ Ask the engineer:
 
 Revise the script if the engineer requests changes. Proceed only when the engineer confirms the script is ready.
 
+**A UAT session CLEARS the rows it created, and the sign-off says so.** UAT usually runs against a shared, long-lived database, by hand — so its fixtures are the one category of test data with no teardown: a suite has its `afterAll`, a CI gate rebuilds its database, and UAT has a human who is finished the moment the script passes. The cost never lands on the session that created them.
+
+Worked example (Ascent, 2026-08-12). A walkthrough needed a second tenant to prove a step, created it plus a company beneath it, recorded a clean pass, and left all three rows behind. The **next** session's full verify went red on a guard asserting the fixture leaves exactly one live tenant — *"a leaked row breaks every operator surface — clean it up"* — costing a diagnosis cycle plus a data-deletion decision that needed the engineer, on rows that session had never seen. The guard was working exactly as designed; nothing upstream of it required the fixtures to be removed.
+
+Required, before the outcome is recorded:
+
+1. **List what the session created** as you go — ids, not just names. A script that seeds anything gets a "fixtures created" line beside its steps.
+2. **Delete them in FK order** when the walkthrough ends, whatever the outcome. A FAILED UAT still cleans up: the finding belongs in the write-up, not in the database.
+3. **Record the cleanup in the sign-off** — "fixtures cleared" or "none created". A blank reads as "not looked at", exactly as an unticked checklist box does.
+4. **Where a fixture must SURVIVE** for a follow-up, say so explicitly in the sign-off and name who removes it and when. A deliberate survivor is fine; an anonymous one is what breaks somebody else's gate.
+
+The tell that this applies: if the walkthrough included the words "create a second …", it created something a guard elsewhere counts.
+
 ### Run the Session
+
+**Prove which artifact is answering before the first step.** A UAT session validates whatever is actually serving the URL, and that is not necessarily the code under test. Before step 1, establish these and record the result in the script:
+
+- **Identify the artifact serving the URL and prove it was built from the branch under test.** Most build systems expose a build or revision id both on disk and in the served response — read both and compare them. Where no such id exists, fall back to the third check below.
+- **Name the process holding the port,** treating a shared port as the default suspicion rather than a surprise. On any machine running several checkouts, worktrees or containers, a tool reporting "server started on port N" may be reporting a server someone else started.
+- **Assert one thing that only this change renders** — a new section, a new control — as a human-readable confirmation that a build id cannot give a stakeholder.
+
+> **Why.** Nothing else in the session distinguishes the wrong artifact. The app looks right, some unrelated-seeming step fails for an unrelated-seeming reason, and every step that "passes" proves something about code the work is not in — so the session's whole output is void, and nothing in it says so.
+>
+> Worked example (Ascent, 2026-08-12): a UAT was one step from running against a **different session's build**. The tooling reported "Server started successfully on port 3001" while the process serving that port was rooted in a different checkout — which also meant its sign-in emails were being written to that checkout's log file rather than the one the tester was reading, so sign-in looked broken for a reason that had nothing to do with the change. The check that would have caught it is one command: `cat .next/BUILD_ID` in the tree under test, against the served page's own `"buildId"`.
 
 Work through the demo script one step at a time. For each step:
 
@@ -95,6 +118,8 @@ Work through the demo script one step at a time. For each step:
 Do not ask for more than one step at a time.
 
 **Tooling-failure fallback:** for a UI-heavy intent where hands-on step-by-step driving is impractical — e.g. the preview/automation browser is unreliable (viewport/coordinate mismatch, renderer hang) — UAT may be evidenced by the intent's deterministic E2E executing each AC in the *authed* app PLUS screenshots confirming the surfaces render, with the method recorded explicitly in the script and the sign-off. This is a fallback for tooling failure, not a substitute for stakeholder validation when hands-on driving is available.
+
+**A tooling failure MIMICS a product failure until you check delivery.** The fallback above governs what to do once tooling is known unreliable; this governs how to find that out, because the first symptom of an automation gap is indistinguishable from a failing step. Before recording a Fail on any interaction step (keys, clicks, focus), verify the interaction was DELIVERED: read `document.activeElement` (or the click target's state) at the moment the input was sent, and run the same interaction as a page-side control (a dispatched DOM event, a `.click()`), which separates "the product ignored it" from "it never arrived". Two traps measured in the field (Ascent, Bolt 174 UAT, 2026-08-12), each of which read as a product defect for several minutes: an automation pane's key synthesis that never reached a provably focused input (arrow/Enter sent, `activeElement` correct, no handler fired — while the deterministic E2E's real keystrokes drive the same path green); and React's change-event dedupe, which ignores a dispatched `input`/`change` event whose value has not actually changed — a synthetic probe that re-sends the current value proves nothing, so change the value first. Record the delivery check in the script whenever it decided a result.
 
 ### Record the Session Outcome
 
