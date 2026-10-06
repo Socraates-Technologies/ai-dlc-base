@@ -8,6 +8,8 @@
 
 **What this skill does not replace:** intent files, mob elaboration (for new features), UAT, the retro, or the Post-Retro Improvement Workflow. A bug bolt is strictly scoped to fixing a known defect — use the standard feature flow for any work that adds or changes behavior.
 
+**Scope fence:** if the session's work grows beyond the intake defects — a new feature, any behavior addition, any schema change — STOP before writing that code and open the feature bolt first: bolt file, risk assessment, backlog entry. A bug bolt's deliberately light ceremony must not ride momentum into feature scope. If a session is interrupted holding work-in-progress, leave a WIP note in the bolt file recording gate status (run / not run · red / green); a session must never end holding schema changes that no build document describes.
+
 ---
 
 ## Step 1 — Bug Intake
@@ -17,7 +19,7 @@ Ask the engineer four questions in one message:
 > "To scope this fix accurately, please tell me:
 > 1. **What is the bug?** Describe the symptom — what the user or system experiences.
 > 2. **Where does it occur?** Name the component, file, function, or user flow.
-> 3. **How is it reproduced?** List the steps or conditions that trigger it.
+> 3. **How is it reproduced?** List the steps AND the conditions that trigger it (parallel load, in-flight requests, timing, environment). A repro that lacks the triggering condition and passes proves nothing — treat a passing repro as inconclusive until the conditions are established.
 > 4. **What is the expected behavior?** What should happen instead?"
 
 Record all four answers before proceeding.
@@ -59,7 +61,7 @@ Then [the system behaves correctly — the expected behavior from Step 1]
 
 Given [the same triggering conditions]
 When [the fix is NOT present — regression guard]
-Then [the broken behavior is detectable — confirm a test would catch a regression]
+Then [the broken behavior is detectable — RUN the guard against the un-fixed code and see it go red]
 ```
 
 At least one unhappy-path AC must be included.
@@ -71,6 +73,8 @@ At least one unhappy-path AC must be included.
 **Pre-generation checks:** Grep for the affected function or component before generating. Confirm no duplicate fix already exists.
 
 **Observability:** Define a log entry or metric that confirms the bug no longer occurs in production.
+
+**A fix for a SILENT failure ships with its DETECTOR, in the same unit.** This applies when the symptom is *valid-looking output with something missing*: a blank image, an empty result set, a dropped field, a null where a value belonged. A log entry nobody thought to write is what let the bug live, so the line above is not enough. The unit delivers **both** the fix and a production-side check that the symptom is absent, and they land together. The detector is not scope to trade away when the bolt looks big, and it often catches the fix itself not working. Scope it to the lane where checking is affordable and damage is highest (usually a write path, once per record), and record which lanes were left out and why.
 
 ---
 
@@ -88,6 +92,8 @@ If no: record "Blast radius: isolated to [component]. No shared interfaces affec
 ## Step 6 — Execute and Verify
 
 Execute the unit. Review output using `process-onboarding-agent/skills/review-checklist.md`.
+
+**Then PROVE the guard fails without the fix — run it, do not reason about it.** Disable the fix (one line: an early `return`, a commented branch), re-run the guard, confirm it goes RED for the reported symptom, restore, confirm green. This catches the two failures a green suite cannot tell from success: a guard whose precondition never exists in the test environment, and a guard that passes for a reason it does not name. Record the probe in the bolt file: what was disabled, what went red, what stayed green. *(Worked example: a five-AC fix, all green. The second probe showed one AC asserted nothing, because the gate browser's scrollbar gutter measures 0 and the guarded branch never ran there.)*
 
 After output is accepted, confirm the fix:
 
