@@ -34,6 +34,27 @@ Ask the engineer four questions to determine which design areas are relevant. As
 
 Question 4 is about the feature's **own** events, not the user's: code that scrolls or refocuses mid-gesture raises events the platform routes through the same handling as the user's input, and can end the interaction it serves. If the answer is yes or unsure, name the platform mechanism that receives those events in **Elaboration Constraints**, with a pointer into the framework source.
 
+**And when the answer names a view controller, window, root or container, name WHICH INSTANCE.**
+*"iOS asks the view controller's `supportedInterfaceOrientations`"* is a correct answer that hides the
+whole defect: the controller actually asked was the modal host's own controller, whose phone default
+is portrait-only, and the feature's app-level setting could not reach it. A mechanism named in the
+abstract is not yet a mechanism located. Write down **which instance is topmost at the moment the
+feature runs**, and read that instance's default out of the library's source rather than assuming it
+inherits — a modal, an embedded web view, a gesture root and a navigation container each carry their
+own copy of whatever the app configured globally. *(Maestro, 2026-09-23: landscape video viewers
+shipped inert. It was the fourth defect in that repo with this shape.)*
+
+**And for every new or moved presented surface (a sheet, modal or dialog), name WHERE IT MOUNTS in
+its presenter's component tree, and which ancestors wrap it.** The instance question above is the
+native half: what the modal does *not* inherit. This is the component-tree half: what still reaches
+in, because in many UI frameworks a modal is separate from the native view tree and nested in the
+component tree at the same time. An ancestor scroller can take its touches, an ancestor that switches
+layout at a breakpoint can remount it, and an ancestor gesture handler can claim its gestures. The
+default answer is **beside** every scroller, at the presenter's root. Where the stack allows it, a
+test that fails on a presented surface mounted inside a scroller makes the answer permanent.
+*(Maestro, 2026-09-30: onboarding sheets on the home screen sat inside a scroller for seven weeks,
+with every first tap swallowed, because their placement read as layout.)*
+
 Record the answers. Use this to decide which steps to run:
 
 | Answer | Steps to include |
@@ -55,6 +76,8 @@ If confirmed, skip to Step 6 (no design artifact is needed).
 
 - **Read its source, not its picture.** Extract colours, sizes, radii and spacing from the markup or design file and map each to the codebase's tokens. A rendered frame and its prose agree closely enough to feel like confirmation, so reading the picture yields confident, wrong numbers rather than visible gaps. Where the design deviates from a repo rule, surface it as a decision for the engineer.
 - **Mark each structural premise decided or inherited.** Name the shapes the plan is about to implement — the page has two tabs, the actions are a row, the list is a sheet — and say whether each is on the record (intent, ADR, engineer sign-off) or merely present in the artifact. Inherited premises go to the engineer now, while overturning one costs a sentence rather than a bolt.
+- **Check every data field it shows exists.** For each concrete field the design displays ("date · duration · uploader"), confirm it is in the relevant API response or derivable on the client. If not, decide now: omit it, derive it, or open a follow-on task. It must not surface for the first time mid-implementation.
+- **Check every asset it specifies is achievable.** Separate what existing code or configuration can produce (a background colour) from what needs a **generated asset** (a composed splash graphic, a new icon set), and name each of the latter as a follow-on task. Record unmet items in the design summary's "Provisional" line; never resolve them silently during the build.
 
 ---
 
