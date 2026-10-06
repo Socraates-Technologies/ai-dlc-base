@@ -98,6 +98,7 @@ Before generating code for this unit, the agent must run these checks:
 - [ ] Any AC whose behaviour the test gate cannot reach (a device, a real network, a person's screen) is Done only against an observation recorded in this unit — date, build or commit, what was done, what was seen. **Where the behaviour is a delivery** (something reaching a person: a message, a notification, a screen state, a file on a device) **the observation is taken at the receiving end**, or from the server's record of the delivered item — never from the sender's own log, which records the attempt whatever happened to it
 - [ ] Reviewed against `process-onboarding-agent/skills/review-checklist.md`
 - [ ] Prompt log updated in `process-onboarding-agent/prompts/`
+- [ ] Anything this unit leaves **owed** — a device observation, a step only a named person can take, a question awaiting a ruling — has its own row in the backlog, naming who owes it and what would close it *(a mention inside this file or a status cell is not a row: after the unit closes, nobody reopens this file, and the backlog is what gets read)*
 - [ ] Unit status set to Done in backlog
 
 ---
