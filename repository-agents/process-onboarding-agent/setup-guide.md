@@ -598,6 +598,7 @@ If the engineer defers, ask for the new date and update Section 9 before continu
 **New engineer induction skill:** read `{FRAMEWORK_ROOT}/skills/new-engineer-induction.md` when an engineer says they are new to the project or invokes it directly.
 **Knowledge promotion skill:** read `{FRAMEWORK_ROOT}/skills/knowledge-promotion.md` as Step 5 of the Post-Retro Improvement Workflow after all improvements are applied. A retro is not closed until every Applied improvement has a Knowledge Promotion status.
 **Dependency audit skill:** read `{FRAMEWORK_ROOT}/skills/dependency-audit.md` when the engineer invokes it, or when the `Next dependency audit` date in Section 9 has been reached. Prompt at session start if the date is due.
+**Architecture review skill:** read `{FRAMEWORK_ROOT}/skills/architecture-review.md` when the engineer invokes it, or monthly alongside the dependency audit — offer it whenever the dependency audit is prompted. Read-only: it recommends refactors, it never makes them.
 **Process health skill:** read `{FRAMEWORK_ROOT}/skills/process-health.md` when the engineer invokes it to audit how well the AI-DLC process is functioning.
 **Compact-docs skill:** read `{FRAMEWORK_ROOT}/skills/compact-docs.md` when the engineer invokes it.
 **Root-cause-analysis skill:** read `{FRAMEWORK_ROOT}/skills/root-cause-analysis.md` when the engineer invokes it, or when an incident is marked Resolved and no RCA has been run on it.
@@ -848,6 +849,20 @@ The skill is scheduled — the next audit date is stored in the master rule file
 Copy this file verbatim from `process-onboarding-agent/skills/dependency-audit.md` to `{FRAMEWORK_ROOT}/skills/dependency-audit.md`. No customization is needed.
 
 **During onboarding (Step 9 of the Process Configuration section):** ask the engineer when they would like to schedule the first audit and populate the `Next dependency audit` row accordingly.
+
+### `skills/architecture-review.md`
+
+The architecture-review skill reads the whole codebase periodically for anti-patterns, duplication, architectural drift and complexity creep, and produces a ranked, dated report of findings with `file:line` evidence, a severity and a concrete recommendation each. It measures the code against the project's own rules — the anti-pattern catalogue in `code-standards.md`, the ADRs, the hard stops and the glossary — not against generic taste, and it tracks each finding across reviews (fixed / still open / worse / new), which is the part a one-off review cannot give. It is read-only: it proposes the top items as candidate bolts for the engineer to ratify and never refactors itself. Where `review-checklist.md` gates one change, this is the whole-codebase, over-time view.
+
+Recommended cadence: monthly, alongside the dependency audit, and after any bolt that added a large new surface.
+
+Copy this file verbatim from `process-onboarding-agent/skills/architecture-review.md` to `{FRAMEWORK_ROOT}/skills/architecture-review.md`. No customization is needed — it reads the project's rules files at runtime.
+
+**Wire into the master rule file Section 6** by adding one routing line:
+
+```markdown
+**Architecture review skill:** read `{FRAMEWORK_ROOT}/skills/architecture-review.md` when the engineer invokes it, or monthly alongside the dependency audit — offer it whenever the dependency audit is prompted. Read-only: it recommends refactors, it never makes them.
+```
 
 ### `skills/process-health.md`
 
