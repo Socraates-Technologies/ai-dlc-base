@@ -722,6 +722,11 @@ The mob elaboration reference. Must include:
   *(Coconuts, 2026-08-25: a constraint governing a shared mixer — "the faders follow the playhead, and the song-wide level stays reachable" — was signed off, implemented on the web client the same day, and never given a mobile AC, because the mobile units were written for a narrower mode and the constraint list was never re-read per surface. Three units two days later put back what one line of a coverage pass would have caught.)*
 - The mandatory interactive protocol (turn structure + never-do rules)
 - Facilitation prompts for: proposing units, proposing ACs, edge case check, observability check (success signal / failure signal / alert threshold per unit), generating implementation scaffold, reviewing output
+- **Measure an unverified premise first.** Before proposing behaviour, ask whether any unit rests on a fact nobody has measured — how a device, library or third-party API actually behaves. If so, measuring it is unit one: its AC is a number or a comparison, and it runs before the units built on the answer.
+- **Sizing — a second caller of a module hard-wired to one endpoint is a generalisation of shipped code, not an addition.** When a unit reuses an existing client or transport for a new endpoint, grep the module for what it names before sizing; if the endpoint is a private constant, the unit changes the shipped caller and is sized, and registered as contract-changing, accordingly.
+- **When a unit reverses, narrows or relies on an earlier AC, quote that AC's own text.** A test named after an AC number records what its author believed the AC meant, and its assertion is often wider. The gap cuts both ways: when a test goes red on new work, ask which broke — the AC, or the test's wider restatement of it — before changing the code; if it is the restatement, narrow the test to the AC and assert the extra property where it belongs.
+- **Precondition existence check, before the summary table:** every AC's Given either already exists in the product or is delivered by a unit that *executes before* this one. "Delivered somewhere in this plan" is satisfied by a later unit, and leaves the AC untestable when it runs.
+- **Re-planning after sign-off — a withdrawn or renamed mechanism is swept in the same commit.** Grep the plan, every unit file and any document that reasons from it (an endpoint, a table, a cap, a code) for its name, and rescope or mark each hit. A unit that still names a withdrawn mechanism looks correct until the day it is next.
 - **Post sign-off — Dependency Map update:** after the engineer confirms sign-off on the unit summary table and before writing any files, read `{FRAMEWORK_ROOT}/ops/inception/dependency-map.md` and update it: record any prerequisites this intent has on other intents, and any shared interfaces (API contracts, data entities) that cross intent boundaries. Add a row to the Update Log. If a dependency on an incomplete intent is found, flag it to the engineer before proceeding.
 
 ### `skills/review-checklist.md`
@@ -931,14 +936,32 @@ Full definitions for every domain term. Each entry: term, definition, usage note
 
 Full descriptions of each known edge case: the scenario, the required behavior, and which parts of the system must handle it. Start with the ones most relevant to your domain. Add entries from retros and incidents.
 
+Seed it with stack-independent entries as well as domain ones, for example:
+- A test whose fixture is derived by the same route as the code under test shares the code's wrong assumption, and is green exactly when the defect ships. State fixtures literally, or derive them by a different route so the two can disagree.
+- A property protected by two mechanisms is pinned by an outcome test that stays green while either one survives. Say so on the test, probe with both removed so it is known it can fail, and record it as "pins the property, neither mechanism".
+- A configuration fact — a scope, a limit, an endpoint — restated in several documents drifts silently. Keep it in one and link from the rest, above all from anything published.
+
 ### `guidelines/acceptance-patterns.md`
 
 Rules for writing good Given/When/Then ACs:
 - One behavior per criterion (no compound ACs)
 - Name the actor in every Given
 - Cover at least one unhappy path per unit
-- No implementation details in ACs
+- No implementation details in ACs — name the outcome, and a mechanism only when choosing it is the decision being signed (a table, an endpoint, where a token lives). The test: would the engineer care if it were done another way with the same result? If not, it comes out
 - Anti-patterns to avoid (vague outcomes, testing implementation not behavior)
+
+Questions the AC set must answer before sign-off:
+- **Remembered state has a correction path.** When a unit makes the system remember something from a user action — a learned default, a taught category — the ACs say how a wrong memory is corrected, whether correcting re-teaches, and what happens to items already filed under it. "Remembers" or "never asks again" with no "correct" or "change" is the tell
+- **An effect added to a reversible act states what the inverse does.** If retire, remove, disconnect or archive now also changes something, an AC says what restore, re-add, reconnect or unarchive does to that same thing — or "unchanged, because …"
+- **"A and B differ" names what makes them differ.** Name the varying input — a clock, a counter, a random source, a signature — and check its precision, since two values made within its resolution are identical; then assert the property (it is recomputed on every read), not the proxy
+- **A numeric bound shows its derivation**, or says it is derived in the unit from a named constant and makes that derivation an AC. Either way, a test builds the largest legal input and asserts it fits. A figure with no arithmetic beside it is pasted forward as fact
+- **A date-dependent AC names a case either side of a clock change**, and the suite sets the time zone it claims and asserts the setting took — likewise any other ambient process state the claim depends on (locale, clock, working directory). On a runner in another zone, both cases silently run the same one
+- **"The user can reach X" is Done only against a recorded observation in a real environment** when the test runner never lays the screen out — it finds an element mid-screen and one past the edge identically. Adding one more control to an existing row is the usual trigger
+- **A guard planted for a later unit is declared in that unit.** A test that asserts something is absent so a future unit must turn it red is a good handoff, but it collides with the default "pass without modification" AC. The unit arming it writes the expected red into the target unit's Definition of Done (or the bolt's open items until that unit exists) and names the target in the test's comment; undeclared, a firing tripwire is indistinguishable from a test bent to fit the code
+
+Proving an AC with a test:
+- **A green falsification probe can mean the guard is unreachable.** If a defect you proved was installed leaves the suite green, first confirm control flow reaches the changed line (a throw or log in the branch). A guard that cannot fire is a production defect; the fix is structural, not more coverage
+- **A timing test owns the quantity it asserts.** Ask what the assertion depends on, and say it at the call site. In order of preference: inject the clock → own the event (fire the interval or release each response by hand — the only option when the value is a count) → test the arithmetic as a pure function → choose a real-time window. An injected seam that reads the ambient source is not owned: would the value change if the machine got busier? Size any real window per test from what it asserts; never assert a transient state with a wait-for-arrival helper, where "not yet" and "already gone" fail identically; and when the harness forces an `await` back into the race, assert the recorded order of events rather than current state
 
 
 ### `guidelines/dev-setup.md`
