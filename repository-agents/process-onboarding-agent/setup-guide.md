@@ -585,6 +585,9 @@ If the engineer defers, ask for the new date and update Section 9 before continu
 Then count the improvement files in `{FRAMEWORK_ROOT}/ops/operate/improvements/` whose Status is `Open` (excluding `_template.md`) and report them in three lines, never the full list:
 > "**N improvement proposals are Open, the oldest from YYYY-MM-DD.** Three to decide: [expired ones first — past their `Decide by` date — then the oldest]. Would you like to decide any of them now?"
 
+Then grep the backlog for owed hotfix retros (`retro + RCA due YYYY-MM-DD`) dated before today. Say nothing when there are none; otherwise:
+> "**A hotfix retro is overdue: [bolt], due YYYY-MM-DD.** Run it now, or say when."
+
 **Elaboration turn structure (strictly one unit per turn):**
 1. Propose one unit — name and one-sentence purpose only. Stop.
 2. Propose ACs as a numbered list. Stop.
