@@ -951,6 +951,7 @@ Rules for writing good Given/When/Then ACs:
 - Anti-patterns to avoid (vague outcomes, testing implementation not behavior)
 
 Questions the AC set must answer before sign-off:
+- **Every AC names the control that triggers it.** "None" means the unit is not done. An AC whose Given names the act in the past tense ("given a record one user edited") tests a consequence of the act, and stays true of a product with no way to perform it; pair it with an AC that the act is reachable and works
 - **Remembered state has a correction path.** When a unit makes the system remember something from a user action — a learned default, a taught category — the ACs say how a wrong memory is corrected, whether correcting re-teaches, and what happens to items already filed under it. "Remembers" or "never asks again" with no "correct" or "change" is the tell
 - **An effect added to a reversible act states what the inverse does.** If retire, remove, disconnect or archive now also changes something, an AC says what restore, re-add, reconnect or unarchive does to that same thing — or "unchanged, because …"
 - **"A and B differ" names what makes them differ.** Name the varying input — a clock, a counter, a random source, a signature — and check its precision, since two values made within its resolution are identical; then assert the property (it is recomputed on every read), not the proxy
