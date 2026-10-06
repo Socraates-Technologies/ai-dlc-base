@@ -47,6 +47,8 @@ Translate the collected ACs into a numbered plain-language demo script. Apply th
 - **A design decision's accepted cost is a step.** Read the intent's design decisions as well as its ACs. Where a decision records a case it deliberately does not serve (e.g. "a record added by mistake can only be archived, not deleted"), write a step that puts the tester in exactly that case, with the design's answer as the expected outcome. A deliberate absence produces no AC and so no step; UAT is the first time anyone meets the cost a document priced. A pass on such a step records that the cost was met and accepted
 - Never mention unit names, AC numbers, Given/When/Then syntax, or technical implementation details in the demo script
 
+**The script is a FILE, not a chat message.** Write the demo script to `process-onboarding-agent/ops/operate/uat/YYYY-MM-DD-<unix_timestamp>-[intent-slug]-uat-script.md` as a results table (`# · Step · Setup · Action · Expected · Result`) plus a Findings table, and point the engineer at the file — they work from it in an editor, never by scrolling chat. Update the Result column and Findings table as the session progresses; the outcome and sign-off land in the same file at close, and the intent's UAT Sign-off links to it. Chat carries only the one-step-at-a-time prompts and result collection.
+
 Present the demo script to the engineer before the session begins:
 
 ```
@@ -89,6 +91,8 @@ Required, before the outcome is recorded:
 
 The tell that this applies: if the walkthrough included the words "create a second …", it created something a guard elsewhere counts.
 
+**Prerequisites before the session starts:** if any demo step depends on a credential, environment variable, or third-party account that does not exist yet, complete and VERIFY that setup before Step 1. A credential is verified by a direct provider call (e.g. curl) returning success, observed in the session — **not** by the platform accepting the secret, **and not by the engineer saying it works**. A verbal "yes" is not a 200; run the check in front of you before the step that needs it. Mid-session credential onboarding burns UAT steps on infrastructure noise, and an unproven key turns every downstream failure into a multi-party diagnosis.
+
 ### Run the Session
 
 **Prove which artifact is answering before the first step.** A UAT session validates whatever is actually serving the URL, and that is not necessarily the code under test. Before step 1, establish these and record the result in the script:
@@ -100,6 +104,8 @@ The tell that this applies: if the walkthrough included the words "create a seco
 > **Why.** Nothing else in the session distinguishes the wrong artifact. The app looks right, some unrelated-seeming step fails for an unrelated-seeming reason, and every step that "passes" proves something about code the work is not in — so the session's whole output is void, and nothing in it says so.
 >
 > Worked example (Ascent, 2026-08-12): a UAT was one step from running against a **different session's build**. The tooling reported "Server started successfully on port 3001" while the process serving that port was rooted in a different checkout — which also meant its sign-in emails were being written to that checkout's log file rather than the one the tester was reading, so sign-in looked broken for a reason that had nothing to do with the change. The check that would have caught it is one command: `cat .next/BUILD_ID` in the tree under test, against the served page's own `"buildId"`.
+
+**Live-deployment hygiene:** when UAT runs against a live deployment, freeze deploys for the duration of the session except fixes to UAT findings. After any such deploy, the tester re-tests in a **fresh tab** — a page served by a previous revision can silently no-op interactive actions (e.g. stale server-side action ids), producing phantom findings that cost a diagnosis cycle.
 
 Work through the demo script one step at a time. For each step:
 
@@ -120,7 +126,7 @@ Work through the demo script one step at a time. For each step:
 
 Do not ask for more than one step at a time.
 
-**Tooling-failure fallback:** for a UI-heavy intent where hands-on step-by-step driving is impractical — e.g. the preview/automation browser is unreliable (viewport/coordinate mismatch, renderer hang) — UAT may be evidenced by the intent's deterministic E2E executing each AC in the *authed* app PLUS screenshots confirming the surfaces render, with the method recorded explicitly in the script and the sign-off. This is a fallback for tooling failure, not a substitute for stakeholder validation when hands-on driving is available.
+**Tooling-failure fallback:** for a UI-heavy intent where hands-on step-by-step driving is impractical — e.g. the preview/automation browser is unreliable (viewport/coordinate mismatch, renderer hang) — UAT may be evidenced by the intent's deterministic E2E executing each AC in the *authed* app PLUS either screenshots confirming the surfaces render OR, where full-viewport screenshots are unavailable, live-DOM inspection of the rendered surface in the signed-in app (element state/text read directly from the page), with the method recorded explicitly in the script and the sign-off. This is a fallback for tooling failure, not a substitute for stakeholder validation when hands-on driving is available.
 
 **A tooling failure MIMICS a product failure until you check delivery.** The fallback above governs what to do once tooling is known unreliable; this governs how to find that out, because the first symptom of an automation gap is indistinguishable from a failing step. Before recording a Fail on any interaction step (keys, clicks, focus), verify the interaction was DELIVERED: read `document.activeElement` (or the click target's state) at the moment the input was sent, and run the same interaction as a page-side control (a dispatched DOM event, a `.click()`), which separates "the product ignored it" from "it never arrived". Two traps measured in the field (Ascent, Bolt 174 UAT, 2026-08-12), each of which read as a product defect for several minutes: an automation pane's key synthesis that never reached a provably focused input (arrow/Enter sent, `activeElement` correct, no handler fired — while the deterministic E2E's real keystrokes drive the same path green); and React's change-event dedupe, which ignores a dispatched `input`/`change` event whose value has not actually changed — a synthetic probe that re-sends the current value proves nothing, so change the value first. Record the delivery check in the script whenever it decided a result.
 
