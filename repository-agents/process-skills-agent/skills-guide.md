@@ -57,6 +57,17 @@ Use this dependency classification key at the top of the catalogue:
 
 ### PLANNING & DESIGN
 
+**Solution Shaping** (`solution-shaping.md`) `◆ Standalone`
+
+Decides the shape of a solution before any design work begins: generic capability or feature-specific implementation, expected usage and scale, the simplest viable approach, extend-vs-build-vs-buy, and how reversible the choice is. The signed-off decision is recorded on the feature brief and constrains the design session that follows — so over-engineering and accidental platform-building are caught before any contract is drawn.
+
+- **When to invoke:** when a high-level feature request lands, before running a design session or breaking work into tasks
+- **How to invoke:** `"Read [skill-path]/solution-shaping.md and shape the solution for [feature name]."`
+- **What you get:** a signed-off Solution Shape record (generic vs specific, usage and scale, simplest viable option, extend/build/buy, reversibility) appended to your feature brief or intent
+- **Adapts to your process:** works against any written feature brief — if you don't keep intent files, state where the shape record should be written
+
+---
+
 **Design Session** (`design-session.md`) `◆ Standalone`
 
 Runs a structured Phase 0 design session before any building begins. Locks down API contracts, data model decisions, and architectural patterns through conversation, then produces a design artifact the team can reference during build.
@@ -148,6 +159,28 @@ Reads package manifests, classifies findings by severity (critical / high / medi
 
 ---
 
+**Architecture Review** (`architecture-review.md`) `◈ Needs config`
+
+Reads the whole codebase for anti-pattern recurrence, duplication, architectural drift, complexity hotspots, dead weight and test gaps on critical paths, and produces a ranked, dated report with `file:line` evidence and a concrete recommendation per finding. Read-only: it recommends refactors and never makes them, and it tracks each finding across reviews (fixed / still open / worse / new).
+
+- **When to invoke:** monthly, alongside the dependency audit, and after any piece of work that added a large new surface
+- **How to invoke:** `"Read [skill-path]/architecture-review.md and run an architecture review on this project."`
+- **What you get:** a ranked findings table, the trend since the last review, and the top one to three items proposed as candidate work for you to ratify
+- **Configuration needed:** the skill measures the code against the project's own rules (coding standards, ADRs, security rules, glossary). For bespoke process use, point it at your equivalent documents when you invoke it, or it falls back to generic practice and says so.
+
+---
+
+**Disk Hygiene** (`disk-hygiene.md`) `◆ Standalone`
+
+Reclaims workstation disk space that AI-assisted development consumes passively — stale git worktrees, package-manager caches, build artefacts, container build cache and orphaned volumes, simulator images. Works in tiers from safe caches to judgment calls, never deletes uncommitted or unmerged work or a database, and verifies every destructive step by re-measuring.
+
+- **When to invoke:** monthly, or whenever free disk space is low
+- **How to invoke:** `"Read [skill-path]/disk-hygiene.md and run a disk hygiene sweep."`
+- **What you get:** a measured before/after report, itemised, with the judgment-call items listed for your decision
+- **Configuration needed:** none. The example commands are for macOS with Docker and the Node, Xcode and Android toolchains; steps for tools the workstation lacks are skipped.
+
+---
+
 **Compact Docs** (`compact-docs.md`) `◈ Needs config`
 
 Archives operational documents older than a configured threshold — keeping the active workspace clean without losing institutional memory.
@@ -156,6 +189,17 @@ Archives operational documents older than a configured threshold — keeping the
 - **How to invoke:** `"Read [skill-path]/compact-docs.md and archive documents older than [N] days in [folder path]."`
 - **What you get:** older documents moved to an archive subfolder; a summary of what was archived
 - **Configuration needed:** state the archive threshold (number of days) and the folder to act on when you invoke the skill. The skill normally reads this from a master rule file; without one, you provide it inline.
+
+---
+
+**Process Visualization** (`process-visualization.md`) `◈ Needs config`
+
+Reconstructs how a batch of work actually got delivered — not the plan, but what really happened — and renders it as Mermaid diagrams: an actual delivery timeline and an actual execution path, plus a plan-vs-actual deviation table. Mines git history for real status-change dates when the project is a git repo; falls back to whatever dates are recorded in your own artifacts otherwise, and says plainly which mode it used.
+
+- **When to invoke:** at the start of a retrospective, before discussing what went well — or any time you want a factual reconstruction of how a piece of work actually unfolded
+- **How to invoke:** `"Read [skill-path]/process-visualization.md and visualize how [bolt/feature name] actually went."`
+- **What you get:** two Mermaid diagrams (timeline + execution path) and a deviation table comparing the plan to reality
+- **Configuration needed:** point it at your equivalent planning and status artifacts (tickets, task files, a project board export) if you don't use AI-DLC bolt/unit files — it reads whatever you tell it holds the plan and the status history. Git-history mining works automatically in any git repo regardless of what planning system you use on top of it.
 
 ---
 

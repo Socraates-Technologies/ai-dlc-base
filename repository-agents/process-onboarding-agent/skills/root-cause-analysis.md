@@ -19,6 +19,8 @@ Ask the engineer:
 
 Read each file in scope fully before proceeding. Do not begin analysis on partial information.
 
+If a file in scope already states what this analysis will conclude — a Definition of Done, backlog row or commit message written before the RCA ran — treat it as a hypothesis to test, not a finding. A pre-written conclusion reads as insight, and a nearly-right one is never re-examined. Artifacts that schedule an RCA should record that it is owed and why, never what it will find.
+
 ---
 
 ## Step 2 — Extract Surface Findings
@@ -85,6 +87,31 @@ Present a pattern table:
 
 Flag any pattern where the same root cause has already produced two or more distinct failures — these are the highest priority recommendations.
 
+### Scope the sweep by MECHANISM, not by the file family where the class was found
+
+**"Files affected" is the column this step gets wrong**, because the honest-looking answer — the
+files where the class has already been seen — is the one that cannot find the next instance.
+
+Write the sweep as a **predicate over behaviour**, then go looking for whatever satisfies it. For a
+timing class, *"any test that causes a timer to be scheduled which it does not itself own"* is
+greppable and family-blind; *"the other files in that folder"* is neither.
+
+*(Riley, 2026-09-01: an RCA recommended sweeping the two test files where the class had been seen. The sweep ran and was reported
+honestly, and it could not have succeeded: hours later the same class surfaced in a debug-probe
+module, armed by a **payload red-line test with no timing content whatsoever**, where it had been
+leaking a real 2-second timer into arbitrary suites at **2 hits in 20 full-suite runs**. One victim
+was a screen-reachability test unrelated to everything in the sweep.)*
+
+Two consequences, both easy to skip:
+
+- **A class can span mechanisms.** The earlier instances were tests racing a window they owned;
+  the one the sweep missed was a leaked handle from production code. Listing them as one class is
+  the point — the shared cause is in the harness, not in any file's subject matter.
+- **This is the diagnosis rule applied one step later.** *"An intermittent failure naming a
+  different file each time is still one class"* fixes how a cause is FOUND. Nothing had said the
+  same about how far the fix REACHES, and the scope of a remediation is exactly where a correct
+  diagnosis quietly stops being useful.
+
 ---
 
 ## Step 6 — Produce the RCA Report
@@ -103,6 +130,12 @@ Write a structured report containing:
 | **Redesign** | A design or architectural decision must change | New intent file; update `process-onboarding-agent/rules/architecture.md` with an ADR |
 | **Technology mitigation** | A technology limitation must be documented and worked around | ADR in `process-onboarding-agent/rules/architecture.md`; new intent if a replacement is warranted |
 | **Process fix** | A workflow, gate, or standard must change | Improvement file via the standard Post-Retro Improvement Workflow |
+
+For every process fix, check three things before presenting it:
+
+- **Effectiveness.** Ask of it the question in `skills/knowledge-promotion.md` — *could this be followed completely and still achieve nothing?* — and tighten it until the sentence cannot be completed. Where the fix is a duty rather than a check, name the existing moment it attaches to.
+- **Reach.** A rule placed in a workflow skill reaches only the work that loads that skill, and the gap is invisible from inside it. List every lane that performs the act — a bug bolt, a hotfix, a fix made during UAT, a unit inside a feature bolt — and if the rule is about an *act* (fixing, committing, adding a constraint) rather than a ceremony, put its one-line form where every lane passes, such as the review checklist, and keep the detail in the workflow skill.
+- **Trigger.** A rule that fires on an observation ("when CI has been red twice…") must name who observes it and when. An observation nobody makes looks exactly like one that found nothing, and a recommendation whose trigger is an observation nobody is obliged to make will fire on nothing — so bind it to a moment that already happens (closing a unit, starting a session) and have the observation recorded there as a value.
 
 Present the report to the engineer and get explicit approval on each recommendation before creating any artifact.
 

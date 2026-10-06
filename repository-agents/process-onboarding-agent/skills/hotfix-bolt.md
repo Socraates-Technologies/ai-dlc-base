@@ -78,6 +78,10 @@ If a staging environment is available:
 
 If no staging environment exists: note this explicitly and ask the engineer to confirm acceptance of the risk before deploying.
 
+**Then ship it — this step blocks.** A P1 is an active outage, and a gated fix that has not deployed is not a fix: the users hitting it cannot tell the difference. Deploy as soon as the engineer authorizes it, and do not treat a green gate as the end of the incident. If the deploy cannot happen now, record the reason in the incident file and state that the outage is ongoing. Confirm the RUNNING build is the commit you meant to ship — a deploy that predates the fix passes every other signal identically.
+
+For a **user-reported symptom**, "verified" means **verified on a real device or environment against that exact symptom**. A green local gate plus a plausible mechanism is not enough to call it fixed. When shipping is cheap (an over-the-air update, a one-command deploy), it is tempting to treat "delivered" as "verified"; it is not. *(Maestro, 2026-07-16: a video-playback fix went out over the air on a passing gate and a plausible mechanism. It was never checked on a device, and the user hit the same error again.)*
+
 ---
 
 ## Step 6 — Create the Incident File
@@ -94,7 +98,7 @@ If an incident file does not already exist for this event, create one now at `op
 
 ## Step 7 — Close and Schedule the Retro
 
-1. Mark unit Done. Mark bolt Done. Update the backlog.
+1. Mark unit Done and bolt Done **only after a production observation confirms the fix** — the running build matches the fix commit, and the symptom is gone on the live surface that failed. Until then both stay In Progress with "awaiting production verification" recorded, and the incident stays Open (measure its duration to the deploy, not the gate). Then update the backlog — and the bolt's backlog row carries the owed retro as a date, `retro + RCA due YYYY-MM-DD` (fix time plus 24 hours). A phrase like "owed within 24 h" cannot be compared to today; a date can, by a grep at session start.
 2. State clearly:
 
 > "The hotfix is complete. A retro is mandatory within 24 hours — please schedule it now. The incident file is at [path]. Run `process-onboarding-agent/skills/root-cause-analysis.md` during or immediately after the retro."

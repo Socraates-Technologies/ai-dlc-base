@@ -35,6 +35,8 @@ Declaring a defect out of scope in the unit's Scope section does **not** protect
 
 **The struck-out list includes the INSTRUMENT.** After naming the product's failure modes, ask "what would make this threshold fail — or pass — even if the code were perfect?" and answer it about the instrument: the test runner and its timeouts, the machine, **the environment the instrument inherits from whatever runs it**, and **whether the instrument can see itself**. A test run by a script that has loaded real credentials inherits them unless the script clears them first; a process watch that searches for a string its own command line contains will find itself every time. Before believing an instrument's zero, show it a known positive. *(makerclub, 2026-09-23: a pre-deploy script loaded the live estate and then ran the gate, whose test inherited the real secrets and failed on perfect code, 37/41; a `ps` watch reported 266 "leaks" that were two per sample — itself. Both after reading a rule that named the runner and the machine, but not these.)*
 
+**A carried-forward item inherits the PREMISE of the decision that carried it — re-test that premise at intake.** NFR work often arrives as "the thing we noted last time": a memo's carried-forward list, a retro's fast-follow, an ADR's "still outstanding" paragraph. Each item's evidence was gathered in a *state*, and the decision that carried it forward may have changed that state. So for every carried-forward item, name the observation that motivates it and ask **which configuration produced that observation, and does it still hold?** Worked example: a hosting decision carried two items forward. It noted that the decision removed the first item's payoff, then listed the second as "complementary" without applying the same test. The second item's only evidence came from a configuration that same decision had just eliminated. It was elaborated, risk-assessed and signed off before the Step 3 measurement refuted it, because those ceremonies ask how to do the work well and none asks whether the premise is real.
+
 ---
 
 ## Step 2 — Identify Affected Intents
@@ -57,11 +59,15 @@ Before generating any unit, confirm the current measured value:
 
 If no measurement exists: the first unit in this bolt must establish the measurement tooling or instrumentation before any improvement work begins. Record the baseline once measured.
 
+**Measure the baseline on the instrument that is slow, and record where the time goes, not only how much.** A stand-in's profile predicts; the production instrument's own record measures. Before the first improvement unit, read that record (a build log, a per-stage timer, a request trace); if none exists, the measurement unit adds one that splits the time by stage. **Set the target after the split shows the bottleneck** — a target derived from one stage's arithmetic assumes that stage is the bottleneck. (makerclub, 2026-09-27: a laptop profile predicted a 10–12 s build on the production builder, which measured 19.6 s; the builder's own log and one dry run on it showed a configuration step re-running on every build, which the laptop never ran. In the same bolt a download target set from the network window's ceiling was missed by a flash-write stage the window did not govern.)
+
+**For a security finding about requests, the instrument includes everything in front of the process.** An in-process test shows what the framework does with a hostile request; in production that request first passes an ingress, proxy, CDN or load balancer, any of which can rewrite it — removing an exposure or adding one. Alongside the in-process test, send the same hostile requests **raw to the live URL** (e.g. `curl --path-as-is`, confirming the raw path in `curl -v`) and record both sets of answers. Where they differ, explain the difference before believing either. (makerclub, 2026-09-30: a path-traversal advisory was assessed in-process as not exposed; the first live probe showed the ingress canonicalising `..`, `//`, `%2E` and `%2F` before forwarding — a layer the assessment could not see. One that decoded `%2F` into a separator would have been just as invisible.)
+
 ---
 
 ## Step 4 — Create the Units
 
-NFR bolts may contain multiple units if the improvement spans more than one component. Apply the standard unit template with these constraints:
+NFR bolts may contain multiple units if the improvement spans more than one component. **If Step 3 found no existing measurement, the first unit is the measurement tooling and every improvement unit follows it — that ordering is not a preference.** A single unit that both measures and improves yields one number with nothing to compare it to, and its green threshold gets credited to the change rather than tested against a before-state. Apply the standard unit template with these constraints:
 
 **ACs must use measurable thresholds:**
 ```
@@ -101,6 +107,10 @@ After all units are Done, verify against the baseline established in Step 3:
 > "Please measure [the metric from Step 1] and compare it against the baseline: [value from Step 3]."
 
 The bolt is not Done until the threshold is verified. If the threshold is not met: set bolt status to Blocked, state the gap (measured vs. target), and propose the next step. Do not silently mark it Done.
+
+**A measured round changes ONE variable, and its decision rule is written before it runs.** Ask the engineer for the rule — e.g. _better than X: keep; no better: close on X; worse: roll back_ — and put it in the unit file with the round's settings. A round that changes two settings needs a third round to attribute its result. (makerclub, 2026-09-27: a round that raised two network windows together regressed 5.5 s → 17.3 s, and a third round was needed to learn that neither helped; that third round, with its rule agreed first, closed on its result in one message.)
+
+**A result AT the threshold is a repeat, not a pass.** When a measurement lands within the instrument's resolution of its threshold, record it as neither met nor missed: write the repeat's rule first (e.g. _clearly under: met; clearly over: Blocked with the gap stated; at the bound again: back to the engineer_), run it once with **nothing changed**, and record both numbers. Reading it as met credits the change with a number the instrument cannot tell from a miss; reading it as missed sends the bolt after a fix it may not need. (makerclub, 2026-09-28: a jitter threshold of ≤ 1 printed `1.00` to two places — anywhere from 0.995 to 1.005; one unchanged repeat under a rule written first read 0.84.)
 
 ---
 

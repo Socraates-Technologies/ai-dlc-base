@@ -144,6 +144,23 @@ For each item:
 
 2. Add the unit to the Open section of `process-onboarding-agent/ops/build/backlog.md` using a reference-style link.
 
+**In a workspace or monorepo, a remediation unit names where the upgraded package will be INSTALLED, not only its
+version.** Package managers that hoist (npm, Yarn classic, pnpm's public hoisting) keep existing placements and put a
+newly added or upgraded package wherever their algorithm prefers, which may not be beside the package it depends on. A
+plugin that extends its host (a type augmentation, a peer it patches, a registry it adds itself to) then resolves a
+different copy of the host, or none, and fails at typecheck or at runtime rather than at install. So the unit's ACs
+include the package manager's own tree listing (`npm ls <package> <its host>`, `pnpm why`, `yarn why`) showing the
+upgrade and its host resolve together, plus the typecheck, and the unit names the install option that keeps the
+placement (npm's `--install-strategy=nested`, for example). _(makerclub, 2026-09-30: an upgraded web-server plugin was
+hoisted to the root, away from the host nested under its workspace, and lost the types of the method it adds.)_
+
+**And the lockfile is written by the package-manager version the repo pins, and its diff is read hunk by hunk.** A
+different version of the same tool rewrites fields the other one wrote, so an upgrade run on the wrong one carries
+changes nobody asked for. Any lockfile hunk the upgrade did not cause is a defect in the unit, not noise to commit.
+_(makerclub, 2026-10-01: an older npm silently dropped every `libc` field a newer npm had written.)_ The same holds
+for any ecosystem whose lockfile records its writer's format (`Cargo.lock`, `poetry.lock`, `Gemfile.lock`'s
+`BUNDLED WITH`, Gradle lockfiles).
+
 After creating all units, summarise:
 
 ```

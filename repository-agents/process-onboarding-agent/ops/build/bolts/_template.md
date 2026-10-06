@@ -48,3 +48,4 @@
 - [ ] No regressions in modules outside this bolt's scope
 - [ ] Retrospective file created and filed
 - [ ] Backlog updated
+- [ ] The merge/closeout commit (or the same push) updates every status line the merge falsifies — each unit file's `Status:`, the bolt's unit-table rows, and this header. A Done bolt containing a Planned unit is the tell: the next session reads the docs as ground truth and gets "is this built?" wrong. *(The unit template's no-blank-DoD-box rule catches unevidenced work; this catches statuses that lag evidenced work.)*

@@ -1,6 +1,8 @@
 # Improvement: [short title]
 
 **Status:** Open | Applied | Rejected
+**Owner:** [the person who decides — never "the team"]
+**Decide by:** [YYYY-MM-DD — fourteen days from raising unless the reason for another date is given; one deferral allowed, with a new date and a reason]
 **Triggered by:** [ops/operate/retros/... or ops/operate/incidents/...](link)
 **Applied date:** —
 **Knowledge promotion:** Pending | Promoted — PR to be raised | Declined — [reason] | Project-specific — [reason]
