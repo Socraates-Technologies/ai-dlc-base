@@ -60,6 +60,10 @@ If multiple components are affected, each becomes a separate unit.
 
 **At the third unit, ask whether this is still a bug bolt.** Each added unit can be individually justified while the total becomes a redesign. Write one line in the bolt file: is this still a defect being fixed, or a change being designed? "Still a bug bolt" is a legitimate answer. If the answer is no, the next unit goes in a new feature or NFR bolt — recording the answer and carrying on is not an option.
 
+**Create bolt and unit files with their evidence empty.** Create them with **Status: In Progress** and the Definition of Done unticked. Every evidence section (probe results, AC ticks, measured numbers, gate output) is either absent or says *"not yet run"*. Write planned probes as a **list, never a results table**, because a table with a "what went red" column is a form, and forms get filled in before anything has run. Tick an AC only after reading the artefact it names. If the AC cites gate output, read the gate output, not the diff that was supposed to produce it. **One exception to "not yet run":** if your gate checks a section for completeness (an AC-to-test traceability check, say), leave that section absent until it can be filled. A placeholder fails the gate before the work it describes has run.
+
+*(Ascent, 2026-08-07: a bolt file was drafted with Status: Done, a ticked Definition of Done and a filled-in probe table naming what went red, before a single probe had run. The same session then ticked an AC from the code's intent, and the closeout gate falsified it on its first run. Ascent, 2026-10-06: a unit created with "not yet run" under its traceability heading failed the project's AC-traceability gate check and cost a full gate cycle.)*
+
 ---
 
 ## Step 4 — Create the Unit
