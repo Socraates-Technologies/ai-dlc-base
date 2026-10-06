@@ -584,6 +584,8 @@ Then read the `Next dependency audit` date from Section 9. If today is on or aft
 > "A dependency and security audit is scheduled. Would you like to run it now, or set a new date?"
 If the engineer defers, ask for the new date and update Section 9 before continuing.
 
+Then read the `Next disk hygiene sweep` date from Section 9 and apply the same rule. Also run the sweep unscheduled whenever free disk space is observed below [headroom threshold].
+
 **Elaboration turn structure (strictly one unit per turn):**
 1. Propose one unit — name and one-sentence purpose only. Stop.
 2. Propose ACs as a numbered list. Stop.
@@ -601,6 +603,8 @@ If the engineer defers, ask for the new date and update Section 9 before continu
 **Knowledge promotion skill:** read `{FRAMEWORK_ROOT}/skills/knowledge-promotion.md` as Step 5 of the Post-Retro Improvement Workflow after all improvements are applied. A retro is not closed until every Applied improvement has a Knowledge Promotion status.
 **Dependency audit skill:** read `{FRAMEWORK_ROOT}/skills/dependency-audit.md` when the engineer invokes it, or when the `Next dependency audit` date in Section 9 has been reached. Prompt at session start if the date is due.
 **Architecture review skill:** read `{FRAMEWORK_ROOT}/skills/architecture-review.md` when the engineer invokes it, or monthly alongside the dependency audit — offer it whenever the dependency audit is prompted. Read-only: it recommends refactors, it never makes them.
+**Architecture review skill:** read `{FRAMEWORK_ROOT}/skills/architecture-review.md` when the engineer invokes it, or monthly alongside the dependency audit. Read-only — it recommends, never refactors.
+**Disk hygiene skill:** read `{FRAMEWORK_ROOT}/skills/disk-hygiene.md` when the engineer says "clean up the disk" or "run disk hygiene", when the `Next disk hygiene sweep` date in Section 9 has been reached, or when free disk space is below [headroom threshold]. Reclaims caches and artefacts only — never source or data.
 **Process health skill:** read `{FRAMEWORK_ROOT}/skills/process-health.md` when the engineer invokes it to audit how well the AI-DLC process is functioning.
 **Compact-docs skill:** read `{FRAMEWORK_ROOT}/skills/compact-docs.md` when the engineer invokes it.
 **Root-cause-analysis skill:** read `{FRAMEWORK_ROOT}/skills/root-cause-analysis.md` when the engineer invokes it, or when an incident is marked Resolved and no RCA has been run on it.
@@ -663,6 +667,7 @@ The dependency audit dates are read and written by the `dependency-audit` skill.
 > "When would you like to schedule the first dependency and security audit? The recommended interval is once a month."
 
 The disk hygiene dates and the headroom threshold are read and written by the `disk-hygiene` skill in the same way. Ask the engineer for the first sweep date (default 30 days out) and keep the 25 GiB threshold unless their builds need more headroom.
+The disk hygiene dates work the same way and are read and written by the `disk-hygiene` skill. Ask when the first sweep should run, and what free-space threshold should trigger an unscheduled one.
 
 ---
 
@@ -940,12 +945,34 @@ The architecture-review skill reads the whole codebase periodically for anti-pat
 Recommended cadence: monthly, alongside the dependency audit, and after any bolt that added a large new surface.
 
 Copy this file verbatim from `process-onboarding-agent/skills/architecture-review.md` to `{FRAMEWORK_ROOT}/skills/architecture-review.md`. No customization is needed — it reads the project's rules files at runtime.
+The architecture-review skill periodically reads the whole codebase for anti-pattern recurrence, duplication, architectural drift, complexity hotspots, dead code, and test gaps on critical paths. It measures findings against the project's own `code-standards.md`, ADRs, security rules, glossary, and edge cases rather than generic style, ranks them by severity with `file:line` and a recommendation, tracks the trend against the previous review, and writes a dated report to `ops/operate/improvements/`. It is read-only: it proposes backlog items for the engineer to ratify and never refactors.
+
+Recommended cadence: monthly, alongside the dependency audit, and after any bolt that added a large surface.
+
+Copy this file verbatim from `process-onboarding-agent/skills/architecture-review.md` to `{FRAMEWORK_ROOT}/skills/architecture-review.md`. No customization is needed.
 
 **Wire into the master rule file Section 6** by adding one routing line:
 
 ```markdown
 **Architecture review skill:** read `{FRAMEWORK_ROOT}/skills/architecture-review.md` when the engineer invokes it, or monthly alongside the dependency audit — offer it whenever the dependency audit is prompted. Read-only: it recommends refactors, it never makes them.
 ```
+
+**Architecture review skill:** read `{FRAMEWORK_ROOT}/skills/architecture-review.md` when the engineer invokes it, or monthly alongside the dependency audit. Read-only — it recommends, never refactors.
+
+### `skills/disk-hygiene.md`
+
+The disk-hygiene skill reclaims workstation disk consumed passively by AI-assisted development — stale worktrees, package-manager caches, build artefacts, and container images and volumes. It measures before and after, removes only what regenerates, refuses to touch any worktree holding uncommitted or unmerged work or any database, data volume, or untracked local data, takes every judgment-call item to the engineer, and reports the measured free-space delta. Its example commands are for macOS, npm, and Docker; the steps and safety rules apply to any workstation.
+
+The skill is scheduled like the dependency audit — `Last disk hygiene sweep` and `Next disk hygiene sweep` rows in Section 9 — and also runs unscheduled when free space drops below a threshold the engineer sets. The recommended cadence is once a month.
+
+Copy this file verbatim from `process-onboarding-agent/skills/disk-hygiene.md` to `{FRAMEWORK_ROOT}/skills/disk-hygiene.md`. No customization is needed.
+
+**Wire into the master rule file Section 6** by adding one routing line:
+
+```markdown
+**Disk hygiene skill:** read `{FRAMEWORK_ROOT}/skills/disk-hygiene.md` when the engineer says "clean up the disk" or "run disk hygiene", when the `Next disk hygiene sweep` date in Section 9 has been reached, or when free disk space is below [headroom threshold]. Reclaims caches and artefacts only — never source or data.
+
+**During onboarding (Step 9 of the Process Configuration section):** ask the engineer when to schedule the first sweep and populate the `Next disk hygiene sweep` row.
 
 ### `skills/process-health.md`
 
