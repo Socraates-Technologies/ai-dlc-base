@@ -78,6 +78,8 @@ If a staging environment is available:
 
 If no staging environment exists: note this explicitly and ask the engineer to confirm acceptance of the risk before deploying.
 
+For a **user-reported symptom**, "verified" means **verified on a real device or environment against that exact symptom**. A green local gate plus a plausible mechanism is not enough to call it fixed. When shipping is cheap (an over-the-air update, a one-command deploy), it is tempting to treat "delivered" as "verified"; it is not. *(Maestro, 2026-07-16: a video-playback fix went out over the air on a passing gate and a plausible mechanism. It was never checked on a device, and the user hit the same error again.)*
+
 ---
 
 ## Step 6 — Create the Incident File
