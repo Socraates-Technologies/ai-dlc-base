@@ -85,6 +85,31 @@ Present a pattern table:
 
 Flag any pattern where the same root cause has already produced two or more distinct failures — these are the highest priority recommendations.
 
+### Scope the sweep by MECHANISM, not by the file family where the class was found
+
+**"Files affected" is the column this step gets wrong**, because the honest-looking answer — the
+files where the class has already been seen — is the one that cannot find the next instance.
+
+Write the sweep as a **predicate over behaviour**, then go looking for whatever satisfies it. For a
+timing class, *"any test that causes a timer to be scheduled which it does not itself own"* is
+greppable and family-blind; *"the other files in that folder"* is neither.
+
+*(Riley, 2026-09-01: an RCA recommended sweeping the two test files where the class had been seen. The sweep ran and was reported
+honestly, and it could not have succeeded: hours later the same class surfaced in a debug-probe
+module, armed by a **payload red-line test with no timing content whatsoever**, where it had been
+leaking a real 2-second timer into arbitrary suites at **2 hits in 20 full-suite runs**. One victim
+was a screen-reachability test unrelated to everything in the sweep.)*
+
+Two consequences, both easy to skip:
+
+- **A class can span mechanisms.** The earlier instances were tests racing a window they owned;
+  the one the sweep missed was a leaked handle from production code. Listing them as one class is
+  the point — the shared cause is in the harness, not in any file's subject matter.
+- **This is the diagnosis rule applied one step later.** *"An intermittent failure naming a
+  different file each time is still one class"* fixes how a cause is FOUND. Nothing had said the
+  same about how far the fix REACHES, and the scope of a remediation is exactly where a correct
+  diagnosis quietly stops being useful.
+
 ---
 
 ## Step 6 — Produce the RCA Report
