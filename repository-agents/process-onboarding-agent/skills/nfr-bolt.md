@@ -35,6 +35,8 @@ Declaring a defect out of scope in the unit's Scope section does **not** protect
 
 **The struck-out list includes the INSTRUMENT.** After naming the product's failure modes, ask "what would make this threshold fail — or pass — even if the code were perfect?" and answer it about the instrument: the test runner and its timeouts, the machine, **the environment the instrument inherits from whatever runs it**, and **whether the instrument can see itself**. A test run by a script that has loaded real credentials inherits them unless the script clears them first; a process watch that searches for a string its own command line contains will find itself every time. Before believing an instrument's zero, show it a known positive. *(makerclub, 2026-09-23: a pre-deploy script loaded the live estate and then ran the gate, whose test inherited the real secrets and failed on perfect code, 37/41; a `ps` watch reported 266 "leaks" that were two per sample — itself. Both after reading a rule that named the runner and the machine, but not these.)*
 
+**A carried-forward item inherits the PREMISE of the decision that carried it — re-test that premise at intake.** NFR work often arrives as "the thing we noted last time": a memo's carried-forward list, a retro's fast-follow, an ADR's "still outstanding" paragraph. Each item's evidence was gathered in a *state*, and the decision that carried it forward may have changed that state. So for every carried-forward item, name the observation that motivates it and ask **which configuration produced that observation, and does it still hold?** Worked example: a hosting decision carried two items forward. It noted that the decision removed the first item's payoff, then listed the second as "complementary" without applying the same test. The second item's only evidence came from a configuration that same decision had just eliminated. It was elaborated, risk-assessed and signed off before the Step 3 measurement refuted it, because those ceremonies ask how to do the work well and none asks whether the premise is real.
+
 ---
 
 ## Step 2 — Identify Affected Intents
@@ -61,7 +63,7 @@ If no measurement exists: the first unit in this bolt must establish the measure
 
 ## Step 4 — Create the Units
 
-NFR bolts may contain multiple units if the improvement spans more than one component. Apply the standard unit template with these constraints:
+NFR bolts may contain multiple units if the improvement spans more than one component. **If Step 3 found no existing measurement, the first unit is the measurement tooling and every improvement unit follows it — that ordering is not a preference.** A single unit that both measures and improves yields one number with nothing to compare it to, and its green threshold gets credited to the change rather than tested against a before-state. Apply the standard unit template with these constraints:
 
 **ACs must use measurable thresholds:**
 ```
