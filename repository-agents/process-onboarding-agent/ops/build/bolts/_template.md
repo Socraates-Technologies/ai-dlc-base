@@ -46,6 +46,7 @@
 - [ ] All units in this bolt have status Done
 - [ ] Integration tests for all affected modules pass
 - [ ] No regressions in modules outside this bolt's scope
+- [ ] UI bolts only: design-comparison screenshots filed in `ops/build/evidence/YYYY-MM-DD-u<id>-<surface>.png` **when they are captured**, and committed with the unit — never only in a session scratchpad, which does not survive a session restart *(Ascent, 2026-10-06: a build's captures were lost on a session restart and had to be re-rendered from the tagged commit at closeout)*. Name the build they were taken from (commit sha / `.next/BUILD_ID`).
 - [ ] Retrospective file created and filed
 - [ ] Backlog updated
 - [ ] Dependency map current — ticked with its evidence: the commit that changed the dependency map, or "no new shared interface — <why>". A box ticked from memory ("updated at sign-off") is the failure this line exists to stop.
