@@ -18,16 +18,42 @@ Read the intent file fully before saying anything. Then open the session by refl
 
 Wait for the engineer to confirm or correct the understanding. Do not proceed until the intent goal is agreed.
 
+**Read the code at the remote tip, and cite the commit.** Fetch, and read the files the design will touch from a fresh checkout of the default branch (e.g. a detached worktree at `origin/main`), not from a working copy that may be behind; write the short commit hash beside every file and line the session quotes. A shared or long-lived checkout can be many commits stale, and `git fetch` moves the ref, not the files you are reading — an AC written against a screen that has since changed is signed off and wrong.
+
 ---
 
 ## Step 2 — Scope the Design
 
-Ask the engineer three questions to determine which design areas are relevant. Ask all three together — this is the one exception to the one-question-per-turn rule, because the answers are interdependent:
+Ask the engineer four questions to determine which design areas are relevant. Ask all four together — this is the one exception to the one-question-per-turn rule, because the answers are interdependent:
 
 > "Before we design, I need to scope the work:
 > 1. Does this feature expose or consume API endpoints or external interfaces?
 > 2. Does it introduce new data entities or change the shape of existing ones?
-> 3. Does it require an architectural pattern not already established in this codebase?"
+> 3. Does it require an architectural pattern not already established in this codebase?
+> 4. Does it drive the platform imperatively — scroll, focus, layout, navigation — while a user interaction or another operation is already in flight?"
+
+Question 4 is about the feature's **own** events, not the user's: code that scrolls or refocuses mid-gesture raises events the platform routes through the same handling as the user's input, and can end the interaction it serves. If the answer is yes or unsure, name the platform mechanism that receives those events in **Elaboration Constraints**, with a pointer into the framework source.
+
+**And when the answer names a view controller, window, root or container, name WHICH INSTANCE.**
+*"iOS asks the view controller's `supportedInterfaceOrientations`"* is a correct answer that hides the
+whole defect: the controller actually asked was the modal host's own controller, whose phone default
+is portrait-only, and the feature's app-level setting could not reach it. A mechanism named in the
+abstract is not yet a mechanism located. Write down **which instance is topmost at the moment the
+feature runs**, and read that instance's default out of the library's source rather than assuming it
+inherits — a modal, an embedded web view, a gesture root and a navigation container each carry their
+own copy of whatever the app configured globally. *(Maestro, 2026-09-23: landscape video viewers
+shipped inert. It was the fourth defect in that repo with this shape.)*
+
+**And for every new or moved presented surface (a sheet, modal or dialog), name WHERE IT MOUNTS in
+its presenter's component tree, and which ancestors wrap it.** The instance question above is the
+native half: what the modal does *not* inherit. This is the component-tree half: what still reaches
+in, because in many UI frameworks a modal is separate from the native view tree and nested in the
+component tree at the same time. An ancestor scroller can take its touches, an ancestor that switches
+layout at a breakpoint can remount it, and an ancestor gesture handler can claim its gestures. The
+default answer is **beside** every scroller, at the presenter's root. Where the stack allows it, a
+test that fails on a presented surface mounted inside a scroller makes the answer permanent.
+*(Maestro, 2026-09-30: onboarding sheets on the home screen sat inside a scroller for seven weeks,
+with every first tap swallowed, because their placement read as layout.)*
 
 Record the answers. Use this to decide which steps to run:
 
@@ -36,14 +62,22 @@ Record the answers. Use this to decide which steps to run:
 | API: yes or unsure | Step 3 |
 | Data model: yes or unsure | Step 4 |
 | Architectural pattern: yes or unsure | Step 5 |
+| Platform events: yes or unsure | An Elaboration Constraints entry naming the mechanism that receives the feature's own events |
 
 Skip any step answered definitively "no". For any "unsure", include the step and mark the relevant section as provisional in the design artifact.
 
-If all three are "no", confirm with the engineer:
+If all four are "no", confirm with the engineer:
 
 > "This intent doesn't appear to introduce new interfaces, data entities, or architectural patterns — the design foundation is inherited from existing conventions. Shall I move straight to unit decomposition?"
 
 If confirmed, skip to Step 6 (no design artifact is needed).
+
+**When a design is supplied** — a mockup, prototype, artboard or handoff bundle — two more checks, whichever steps run:
+
+- **Read its source, not its picture.** Extract colours, sizes, radii and spacing from the markup or design file and map each to the codebase's tokens. A rendered frame and its prose agree closely enough to feel like confirmation, so reading the picture yields confident, wrong numbers rather than visible gaps. Where the design deviates from a repo rule, surface it as a decision for the engineer.
+- **Mark each structural premise decided or inherited.** Name the shapes the plan is about to implement — the page has two tabs, the actions are a row, the list is a sheet — and say whether each is on the record (intent, ADR, engineer sign-off) or merely present in the artifact. Inherited premises go to the engineer now, while overturning one costs a sentence rather than a bolt.
+- **Check every data field it shows exists.** For each concrete field the design displays ("date · duration · uploader"), confirm it is in the relevant API response or derivable on the client. If not, decide now: omit it, derive it, or open a follow-on task. It must not surface for the first time mid-implementation.
+- **Check every asset it specifies is achievable.** Separate what existing code or configuration can produce (a background colour) from what needs a **generated asset** (a composed splash graphic, a new icon set), and name each of the latter as a follow-on task. Record unmet items in the design summary's "Provisional" line; never resolve them silently during the build.
 
 ---
 
@@ -59,7 +93,9 @@ For each endpoint, ask the following in sequence — one question per turn:
 
 2. > "What is the method and path? (or the equivalent if this is not a REST interface)"
 
-3. > "What does the request contain? List the field names and types. Mark any that are optional."
+3. > "What does the request contain? List the field names and types. Mark any that are optional — and for each optional field, say what the server does when it is absent and what it does when it is empty."
+
+   These are two different facts. When the plan splits the seam into a server unit and a client unit, each author otherwise decides one of them alone.
 
 4. > "What does a successful response look like? List the fields and types."
 
@@ -98,6 +134,12 @@ For each entity, ask the following in sequence — one question per turn:
 After each entity, ask:
 
 > "Is there another entity to design, or is the data model complete?"
+
+**Precedent check:** Before closing the data model, for every field whose nullability, default or "means none" representation you are about to decide, search the existing schema and migrations for a field that already answers the same question. Follow it, or state why this case differs — a convention settled in a migration comment is not an ADR, so the conflict check below will not see it.
+
+**A claim about what an existing module contains is a precedent claim too.** Any design sentence saying what another module includes, returns, walks or exposes cites the file and line it was read from. Where it was not read, write the weaker sentence you can support, or make reading it the unit's first check — a sentence from memory becomes an AC that cannot be built.
+
+**Shared-interface check:** Read `process-onboarding-agent/ops/inception/dependency-map.md` § Shared Interfaces and, for every entity this design creates, name each row that reaches it — a row reading "every intent that adds X" binds this design as soon as it adds an X. Write those rows into Elaboration Constraints and give the unit that adds the entity the AC the row requires. The map is otherwise read only at sign-off, after every AC is fixed.
 
 **Conflict check:** Before closing the data model, read `process-onboarding-agent/rules/architecture.md`. If any proposed entity name, field name, or relationship contradicts an existing ADR, surface the conflict immediately:
 
@@ -160,6 +202,11 @@ Generalises past components to any host with an admission rule: a route with a r
 ---
 
 ## Step 6 — Design Sign-off and Artifact
+
+Before presenting the summary, check the premises the design rests on:
+
+- **Environment-gated behaviour states when the variable is read.** For any behaviour "enabled when `X` is set", say whether `X` is read at build time or at request time, and prove it by running the built artifact with `X` unset. The answer decides where the variable is set, the order of deploy steps, and which test is true.
+- **A measurement of an external system uses an instrument that can falsify it, and a sample drawn from the users' own sources.** If the premise is "the provider treats a server differently from a browser", measure in a browser — a tool the provider refuses cannot tell a refusal from an answer. A probe that lands on a 404 measures routing and is discarded, not counted. Put the sites, services and apps the users actually use into the sample first; a category sample answers "does this work in general?", and a user's own source that fails is a design decision for the engineer, not a footnote.
 
 Present a design summary before writing any files:
 
