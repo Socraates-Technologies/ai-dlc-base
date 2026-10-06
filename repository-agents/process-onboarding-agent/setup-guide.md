@@ -610,7 +610,7 @@ The delivery and version-control rules at the end of the template are inline too
 **Session start check:** At the beginning of every session, present the following note to the engineer:
 > "At any point during this session, if you have a question about a step, need further clarification, or don't have the exact answer to a question I'm asking — just say so. I'll help you work through it so we don't get blocked."
 
-Then read the `Next dependency audit` date from Section 9. If today is on or after that date, prompt the engineer before any other work:
+Then read the `Next dependency audit` date from Section 9 as it stands on the shared remote's main branch, not in the local checkout (fetch, then read the master rule file at `origin/main`). Where sessions run in parallel the checkout is often stale, and another session may already have run the audit or sweep and moved the date. If today is on or after that date, prompt the engineer before any other work:
 > "A dependency and security audit is scheduled. Would you like to run it now, or set a new date?"
 If the engineer defers, ask for the new date and update Section 9 before continuing.
 
