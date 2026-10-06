@@ -75,6 +75,13 @@ After each endpoint, ask:
 
 > "The field [name] looks like a synonym for [glossary term]. Should I use [glossary term] to stay consistent with the domain language?"
 
+**A picker or dialog the PLATFORM owns is designed from what the platform will LIST, and from the filter its API offers.** A browser's device or port chooser, an OS file dialog, a native share sheet or contact picker, a permission prompt: the product cannot style it or reorder it, and a handoff tends to draw it with the one right entry in it. The real list is whatever the user's machine holds. So for every such picker the feature consumes, treat it as an external interface and answer two questions in this step, recorded in the design artifact beside the call that opens it:
+
+> "On a typical user's machine, what will this picker list?"
+> "Which filter or option does its API offer to narrow that list to what the thing can actually be — and are we passing it?"
+
+*(makerclub, 2026-10-05: the handoff drew a serial-port picker holding the dev kit alone; the browser listed seven ports, six of them Bluetooth speakers, and the engineer's first walk asked for the filter the API had offered all along.)*
+
 ---
 
 ## Step 4 — Data Model
@@ -228,3 +235,13 @@ Once the design artifact is written (or confirmed as not needed), state clearly:
 > "Design foundation is set. I'll now propose units — one at a time — starting with the first logical slice of [intent name]."
 
 Continue directly into the mob elaboration turn structure from `mob-elab-prompts.md`. Do not pause for engineer acknowledgment before proposing the first unit.
+
+---
+
+## Step 8 — After sign-off: a design a unit overrules is CORRECTED, and a review that asks for decisions is CLOSED
+
+The design artifact authorises every unit built against it, so it must keep describing the software that is actually running. Two failures of the same kind — a document that authorised work and then went stale under it — are guarded against here.
+
+**A unit that overrules a signed design amends the design artifact in its own commit.** A unit may find that a design row contradicts an ADR, or that a value in it would be wrong in production, and decide against the design. That call may well be right. But the unit file records only *that* it changed something; the design is the only place that records *what it now is*. So the same commit that ships the overruling code edits the affected row of the design artifact — the new value, one line on why, and a link to the unit — and the unit's review checks that it did. *(makerclub, 2026-09-21: two signed design rows — an error contract, and a rate limit that would have locked a whole classroom out on one child's typos — were overruled correctly inside units' pre-generation checks, and four units later the design still said the old thing, so every later reader inherited a document describing software nobody was running.)*
+
+**A review that asks the engineer for decisions carries a decision line per item, and is closed only when the last one lands.** A design review, a handoff review or a contradiction list raised against signed decisions gets a per-item state table — item, recommendation, decision (accepted / rejected / open), who decided, date — and its header says _Closed_ only when no item is open. A recommendation that is followed without being decided leaves code that is right by luck: correct today, with nothing to say why, and nothing to stop the next reader taking the other branch. **An undecided item older than the units built from it is a blocker, not a footnote** — raise it with the engineer before the next unit in that area starts. *(makerclub, 2026-09-21: a review raised four contradictions; three were decided the same day, and the fourth was recommended on, obeyed and never accepted — its review file still read "not yet accepted, no code has been written from it" long after a unit had built the editor from it.)*
