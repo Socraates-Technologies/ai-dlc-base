@@ -38,6 +38,7 @@ For each unit in the bolt, work through the following — internally, without as
 | What is the worst-case impact if this unit introduces a defect? | Data loss, broken auth, degraded UI, silent failure, cascading failure in downstream modules |
 | Does this unit touch any boundary defined in architecture.md? | API contracts, service boundaries, data ownership rules |
 | Does this unit touch a forbidden zone? | Check forbidden-zones.md if it exists |
+| Does this unit create a hosted resource of a TYPE this account has never held? | A first use often needs an account-level switch — a cloud provider registration, an API to enable — that fails at the create call and that no fake models, because the fake was written by someone whose account already had it. Record yes / no / unknown; where not "no", the creating code checks and performs the registration itself |
 
 After assessing all units, produce a blast radius table:
 
