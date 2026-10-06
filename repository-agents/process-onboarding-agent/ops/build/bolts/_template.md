@@ -48,4 +48,5 @@
 - [ ] No regressions in modules outside this bolt's scope
 - [ ] Retrospective file created and filed
 - [ ] Backlog updated
+- [ ] Dependency map current — ticked with its evidence: the commit that changed the dependency map, or "no new shared interface — <why>". A box ticked from memory ("updated at sign-off") is the failure this line exists to stop.
 - [ ] The merge/closeout commit (or the same push) updates every status line the merge falsifies — each unit file's `Status:`, the bolt's unit-table rows, and this header. A Done bolt containing a Planned unit is the tell: the next session reads the docs as ground truth and gets "is this built?" wrong. *(The unit template's no-blank-DoD-box rule catches unevidenced work; this catches statuses that lag evidenced work.)*
