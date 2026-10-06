@@ -55,6 +55,7 @@ Ask this of the prose itself, including when the answer above was *prose only*: 
 Ask it here rather than leaving it to the rule's author: the thing the author was holding while living the incident is the thing the sentence omits, and promotion is the first reading by someone who was not there.
 
 **Ask it of the retro's and RCA's own recommendations too.** They are the most exposed, because they are written by whoever has just been the person who noticed. A rule whose trigger is an observation ("when X goes red twice, open a bug") cannot even be seen to be broken, since nothing records an observation not made. Bind such a duty to a moment that already happens — a template field, a session-start check, a Definition of Done line — or record it honestly as advice.
+
 **Where the gate cannot reproduce the defect at all** — the test environment cannot exercise the mechanism (gestures, scrolling, a native or hardware path) — a behavioural test cannot see the class, and the obvious structural test is a pin on the one site that was fixed. It reads as coverage and protects only that site. The check instead:
 
 - **scans every site from source**, parsing where a regex would under-report;

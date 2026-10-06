@@ -34,6 +34,7 @@ This repo is the **base template** — the source of truth that gets copied into
 | `repository-agents/process-onboarding-agent/ops/build/units/_template.md` | Template for an atomic unit of work |
 | `repository-agents/process-onboarding-agent/ops/build/bolts/_template.md` | Template for a planned batch of units |
 | `repository-agents/process-onboarding-agent/ops/build/backlog.md` | Starter backlog file with Reference Link Registry — all unit/bolt links use reference-style Markdown so compact-docs only updates the registry, never the table rows |
+| `repository-agents/process-onboarding-agent/ops/build/id-reservations.md` | Starter id ledger — one table per id family (units, bolts, intents, ADRs, edge cases, migrations) with a "Next free" marker each. Ids are stamped from it at push time, never at planning time. |
 | `repository-agents/process-onboarding-agent/ops/operate/retros/_template.md` | Template for a bolt retrospective (includes Post-Retro Improvement Workflow — AI-driven, runs immediately after every retro) |
 | `repository-agents/process-onboarding-agent/ops/operate/incidents/_template.md` | Template for a production incident |
 | `repository-agents/process-onboarding-agent/ops/operate/improvements/_template.md` | Template for a process improvement triggered by a retro or incident |
@@ -93,6 +94,7 @@ The onboarding agent first asks where your process documentation lives, then ins
         inception/elaborations/
         inception/dependency-map.md
         build/backlog.md
+        build/id-reservations.md
         build/units/
         build/bolts/
         operate/retros/

@@ -148,6 +148,28 @@ Reads package manifests, classifies findings by severity (critical / high / medi
 
 ---
 
+**Architecture Review** (`architecture-review.md`) `◈ Needs config`
+
+Reads the whole codebase for anti-pattern recurrence, duplication, architectural drift, complexity hotspots, dead weight and test gaps on critical paths, and produces a ranked, dated report with `file:line` evidence and a concrete recommendation per finding. Read-only: it recommends refactors and never makes them, and it tracks each finding across reviews (fixed / still open / worse / new).
+
+- **When to invoke:** monthly, alongside the dependency audit, and after any piece of work that added a large new surface
+- **How to invoke:** `"Read [skill-path]/architecture-review.md and run an architecture review on this project."`
+- **What you get:** a ranked findings table, the trend since the last review, and the top one to three items proposed as candidate work for you to ratify
+- **Configuration needed:** the skill measures the code against the project's own rules (coding standards, ADRs, security rules, glossary). For bespoke process use, point it at your equivalent documents when you invoke it, or it falls back to generic practice and says so.
+
+---
+
+**Disk Hygiene** (`disk-hygiene.md`) `◆ Standalone`
+
+Reclaims workstation disk space that AI-assisted development consumes passively — stale git worktrees, package-manager caches, build artefacts, container build cache and orphaned volumes, simulator images. Works in tiers from safe caches to judgment calls, never deletes uncommitted or unmerged work or a database, and verifies every destructive step by re-measuring.
+
+- **When to invoke:** monthly, or whenever free disk space is low
+- **How to invoke:** `"Read [skill-path]/disk-hygiene.md and run a disk hygiene sweep."`
+- **What you get:** a measured before/after report, itemised, with the judgment-call items listed for your decision
+- **Configuration needed:** none. The example commands are for macOS with Docker and the Node, Xcode and Android toolchains; steps for tools the workstation lacks are skipped.
+
+---
+
 **Compact Docs** (`compact-docs.md`) `◈ Needs config`
 
 Archives operational documents older than a configured threshold — keeping the active workspace clean without losing institutional memory.
