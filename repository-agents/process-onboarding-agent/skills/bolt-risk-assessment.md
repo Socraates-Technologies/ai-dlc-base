@@ -38,6 +38,7 @@ For each unit in the bolt, work through the following — internally, without as
 | What is the worst-case impact if this unit introduces a defect? | Data loss, broken auth, degraded UI, silent failure, cascading failure in downstream modules |
 | Does this unit touch any boundary defined in architecture.md? | API contracts, service boundaries, data ownership rules |
 | Does this unit touch a forbidden zone? | Check forbidden-zones.md if it exists |
+| Does this unit create a hosted resource of a TYPE this account has never held? | A first use often needs an account-level switch — a cloud provider registration, an API to enable — that fails at the create call and that no fake models, because the fake was written by someone whose account already had it. Record yes / no / unknown; where not "no", the creating code checks and performs the registration itself |
 
 After assessing all units, produce a blast radius table:
 
@@ -54,6 +55,12 @@ Flag any unit rated High immediately before presenting the full table:
 > "Unit [name] has a high blast radius — it touches [module] which [existing behavior]. I'll highlight this in the assessment."
 
 **A mechanical sweep encodes the assumptions that were true of the set it was written for — re-verify them when the set grows.** Where a unit will apply the same scripted edit across many files, its safety rests on a pre-check performed on *those* files: that they all share the shape the script assumes. That premise expires silently. A rebase, a merge, or a concurrent session can add one more file that violates it, and re-running the sweep then damages that file while reporting success. So: re-run the sweep's **pre-checks**, not merely the sweep, after any event that grows the target set; prefer a sweep that **fails loudly on an unexpected shape** over one that transforms whatever it is given; and where the invariant must outlive the sweep, land a **drift-guard test** so the gate enforces it rather than the next author remembering — the sweep fixes today, the guard fixes next week. Damage is proportional to distance from a compile error: an unused import costs one gate run, a wrong behavioural assumption costs a debugging session.
+
+**When a unit ADDS A MEMBER to a rendered set, search for an assertion on the SET — not only for a collision with a member.** Blast radius asks what a change *touches*. This covers a change that touches nothing and breaks something anyway: a navigation, a tab row, a menu, a group of controls, a list of statuses. The instinct is to ask *"does my new member's name collide with an existing selector?"* — and the answer is usually no, which is a correct answer to the wrong question. What breaks is a test asserting the set's **membership**: an equality against the full list, a count, a snapshot of a group's children.
+
+The failure mode is **right files, wrong property**, and it is worth naming separately because it reads as thorough. A worked example: an assessment searched the three specs that referenced a tab row, asked whether a new tab's label would collide with their existing selectors, and concluded "collides with nothing". One of those specs asserted the tab list by equality — with its own comment explaining that the equality existed *precisely* so the set could not drift silently. The guard worked; the enumeration did not, and the assessment had been signed on the strength of it.
+
+The search is mechanical: grep the equality and count forms alongside the container's identifier across the test corpus, then read what the matches assert about the container you are adding to. **And when such a guard goes red, UPDATE the set — never loosen it:** an equality converted to a "contains" can no longer catch the next member, which was the whole property it held.
 
 ---
 
@@ -94,6 +101,8 @@ Assess each of the following:
 
 **Partial rollback:** If only some units in the bolt are merged when a problem is found, can those units be reverted independently, or do they form an atomic group that must be reverted together?
 
+**Image rollback across a migration:** If any unit adds a migration, can the PREVIOUS deployed build start against the migrated schema? Answer it by reading the migration runner, not from "migrations are additive": a runner that refuses a recorded migration it has no file for makes every rollback past a migration an outage. And a rollback that has never been run is a hypothesis — say when it was last rehearsed against the real environment, or that it never has been.
+
 Produce a rollback summary:
 
 ```
@@ -108,6 +117,8 @@ Data rollback:   [Not required — no schema or data changes]
 Partial rollback:[Each unit is independently revertible]
                  [Units [X] and [Y] must be reverted together — [reason]]
 ```
+
+**Who else deploys:** If more than one session or person can deploy to the same environment, the deploy re-reads what is live IMMEDIATELY before it acts — an unreadable reading is a stop, not "no change" — and takes a lock the others can see. The rollback target named above is read again at deploy time; the one read during this assessment may already be out of date.
 
 ---
 
