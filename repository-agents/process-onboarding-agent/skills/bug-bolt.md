@@ -52,6 +52,8 @@ Identify the minimum set of changes needed to fix the bug without side effects. 
 
 If multiple components are affected, each becomes a separate unit.
 
+**Ask it again as a control when the diagnosis is a shape.** Before writing the fix, name a sibling site with the same shape and state both branches first: the sibling fails too, so the shape is confirmed; the sibling works, so something protects it you have not found, and the fix waits. Stated after the answer, the question only confirms.
+
 **Taking the cheap fix over the structural one.** When you knowingly choose a local fix over a structural one, write its expiry condition into the unit — and phrase it against the cause left in place, not the symptom just fixed. "If the flash returns" never fires, because the fix makes that one symptom unlikely; "if anything else traceable to [the mechanism] appears" does.
 
 **At the third unit, ask whether this is still a bug bolt.** Each added unit can be individually justified while the total becomes a redesign. Write one line in the bolt file: is this still a defect being fixed, or a change being designed? "Still a bug bolt" is a legitimate answer. If the answer is no, the next unit goes in a new feature or NFR bolt — recording the answer and carrying on is not an option.
@@ -117,6 +119,7 @@ Evidence rules for the verification:
 - **Read the suite total before and after the fix, not the target's colour.** Green on the target and red elsewhere is a fix plus a new defect, and the new one is yours.
 - **A run with no summary line ran nothing.** A runner or script that reports a result must check the test summary exists first; an empty run is invalid, re-run, and recorded — never counted as green.
 - **A refuted repair is reverted, not softened.** If the fix fails the same way it did before, the diagnosis was wrong: revert the change, record the attempt in the bolt file, and do not keep it with a weaker comment because it is defensible on its own terms.
+- **A refuted hypothesis is struck everywhere it was stated as the cause.** The entry recording the refutation lists the other places it was written — unit notes, code comments, edge-case prose — and corrects them in the same commit. Those are the files the next session opens first.
 - **A determinism claim needs a second varied condition.** Before writing "fails only under X", vary one more thing (another host, ordering, worker count) — or write what was observed: "reproduced 2/2 in a full run, 0/3 in isolation, not seen elsewhere".
 
 ---
@@ -126,4 +129,5 @@ Evidence rules for the verification:
 1. Mark unit Done. Mark bolt Done. Update the backlog.
 2. Create a retro file and run the Post-Retro Improvement Workflow. Every action the retro hands on gets a backlog row in the same commit; a retro's actions table is not reopened by anything, the backlog is.
 3. If the bug was flagged as **recurring** in Step 2: read `process-onboarding-agent/skills/root-cause-analysis.md` and run it now. Do not skip.
+   Record that the RCA is owed and why, never what it will find. A conclusion written into the bolt, backlog or commit message before the RCA runs takes away its independence.
 4. If the bug caused a production impact: create or update an incident file at `ops/operate/incidents/`.
