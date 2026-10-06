@@ -722,6 +722,10 @@ The mob elaboration reference. Must include:
   *(Coconuts, 2026-08-25: a constraint governing a shared mixer — "the faders follow the playhead, and the song-wide level stays reachable" — was signed off, implemented on the web client the same day, and never given a mobile AC, because the mobile units were written for a narrower mode and the constraint list was never re-read per surface. Three units two days later put back what one line of a coverage pass would have caught.)*
 - The mandatory interactive protocol (turn structure + never-do rules)
 - Facilitation prompts for: proposing units, proposing ACs, edge case check, observability check (success signal / failure signal / alert threshold per unit), generating implementation scaffold, reviewing output
+- **At the AC turn — choose the default AC's form after the count/set sweep, not before it.** When a unit adds a member to a set the tests pin (an enum value, a registry entry, a contract method, a menu item), sweep the suites for count and set-membership assertions at the AC turn, and write the default AC's form (M3.3) from what the sweep found: tests that pin the count or the set mean the contract-change form and a Breaking Changes Register. Choosing the standard form first and sweeping later turns one approval into two.
+  *(makerclub, 2026-09-28: a unit proposed the standard form, four tests pinned the set's count, and the contract-change form needed a second sign-off after the first.)*
+- **At the edge-case turn — an AC triggered by a message names the message's cardinality and cites where it is SENT.** Once per process start, once per connection, or once per event — read from the code that encodes and sends it, not from the code that consumes it. A consumer shows what a field means; only the sender shows how often it arrives. One grep for the message's encoder answers it.
+  *(makerclub, 2026-09-28: a device's greeting is sent on every connect while its reset-reason field is per boot, so an AC keyed on that field repeated after every network drop; its fix then assumed a heartbeat's first timing nobody had read in the sender.)*
 - **Post sign-off — Dependency Map update:** after the engineer confirms sign-off on the unit summary table and before writing any files, read `{FRAMEWORK_ROOT}/ops/inception/dependency-map.md` and update it: record any prerequisites this intent has on other intents, and any shared interfaces (API contracts, data entities) that cross intent boundaries. Add a row to the Update Log. If a dependency on an incomplete intent is found, flag it to the engineer before proceeding.
 
 ### `skills/review-checklist.md`
@@ -931,6 +935,9 @@ Full definitions for every domain term. Each entry: term, definition, usage note
 
 Full descriptions of each known edge case: the scenario, the required behavior, and which parts of the system must handle it. Start with the ones most relevant to your domain. Add entries from retros and incidents.
 
+Shapes worth seeding a new project's file with, before any retro finds them the hard way:
+- **In-memory state written after an `await` in a per-event handler is unordered.** Each handler can be correct on its own while the system assumes handlers finish in the order their events arrived. Such state is either **monotonic** (a write that would move it backwards is refused) or **serialised**; a reader that pairs it with a database row reads the in-memory state **first**, before the row; and every new store of this kind names which of the two it is and has a test that delivers two writes out of order. *(makerclub, 2026-09-28: twice in one bolt and once in a peer's handler the same day — a late progress frame overwrote a newer one, and a watcher paired a row read before a state change with a stage read after it.)*
+
 ### `guidelines/acceptance-patterns.md`
 
 Rules for writing good Given/When/Then ACs:
@@ -939,6 +946,9 @@ Rules for writing good Given/When/Then ACs:
 - Cover at least one unhappy path per unit
 - No implementation details in ACs
 - Anti-patterns to avoid (vague outcomes, testing implementation not behavior)
+- **An authenticated route's ACs include the anonymous-malformed case:** _Given no credential and a body that would fail validation, when the route is called, then the answer is `401` and says nothing about the body._ A suite whose every request sends a valid body cannot see an auth check that runs after body parsing or validation. *(makerclub, 2026-09-21: a token check placed after body parsing answered anonymous bad bodies with 400, describing the schema to a caller who had not authenticated, while 71 green tests all sent valid bodies.)*
+- **A test for a user-facing string pins the AC's words, never the constant the code exports.** Where an AC quotes copy a person reads — an error, a prompt, a button — the test spells out the literal string from the AC, not an import of the constant (or a template built from the same source) the code uses; everywhere else, importing the constant is right. An assertion whose expected value comes from the module under test proves only that the module agrees with itself, and the shape is mechanical enough to sweep for. *(makerclub, 2026-09-21: a falsification probe changed an error message and the suite stayed green, because the test imported the constant the probe had just mutated.)*
+- **A test vector for a selection rule puts the winner where the naive rule would not pick it.** "Keep the strongest", "the newest", "the highest score" each have a naive reading — keep the first — that a fixture can pass by accident. List the winner second or later, and say so in a note on the fixture so a reader knows the order is deliberate. *(makerclub, 2026-10-05: a "keep the strongest" vector listed the strongest first, and an implementation that kept the first passed it; reordered, the same mutation went red.)*
 
 
 ### `guidelines/dev-setup.md`
