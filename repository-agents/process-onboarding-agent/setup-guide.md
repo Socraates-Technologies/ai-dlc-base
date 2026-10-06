@@ -585,6 +585,11 @@ Then read the `Next dependency audit` date from Section 9. If today is on or aft
 If the engineer defers, ask for the new date and update Section 9 before continuing.
 
 Then read the `Next disk hygiene sweep` date from Section 9 and apply the same rule. Also run the sweep unscheduled whenever free disk space is observed below [headroom threshold].
+Then count the improvement files in `{FRAMEWORK_ROOT}/ops/operate/improvements/` whose Status is `Open` (excluding `_template.md`) and report them in three lines, never the full list:
+> "**N improvement proposals are Open, the oldest from YYYY-MM-DD.** Three to decide: [expired ones first — past their `Decide by` date — then the oldest]. Would you like to decide any of them now?"
+
+Then grep the backlog for owed hotfix retros (`retro + RCA due YYYY-MM-DD`) dated before today. Say nothing when there are none; otherwise:
+> "**A hotfix retro is overdue: [bolt], due YYYY-MM-DD.** Run it now, or say when."
 
 **Elaboration turn structure (strictly one unit per turn):**
 1. Propose one unit — name and one-sentence purpose only. Stop.
@@ -628,6 +633,20 @@ Then read the `Next disk hygiene sweep` date from Section 9 and apply the same r
 
 **Concurrent sessions — a ledger conflict is resolved hunk by hunk; "keep both" is mechanical too.** Files several sessions append to (the backlog, the id ledger, the ADR log) conflict on rebase routinely, and your side of the hunk was cut from an older default branch, so it can hold stale copies of a peer's rows. Keep upstream's rows as they are, add only the lines you wrote, and before `rebase --continue` read `git diff origin/main -- <file>`: it must show only your `+` lines, or the resolution is wrong. *(makerclub, 2026-09-28: a "keep both" resolution carried two peer units as "not deployed" while the default branch said deployed.)*
 ```
+
+**Why the Open proposals are read at session start, and only three of them.** Knowledge promotion runs after a retro's improvements are applied, so a proposal still awaiting a decision never reaches it; session start is the one moment every session is known to look. Keep it to a count, an age and three names at any queue length — a long block at every session start is skimmed, and a check that fires on ordinary work trains people to ignore it. The full list belongs in the knowledge-promotion run. Every proposal carries an **Owner** (a person, never "the team") and a **Decide by** date (fourteen days from raising unless it says why not), set by whoever raises it. At that date it is approved, or rejected with the reason recorded; it may be deferred once, with a new date and a reason. Do not back-fill dates onto proposals somebody else raised — that invents a commitment they never made.
+
+**Shared working tree.** If more than one agent session will work against the same repository, add a **Version control** block to Section 6. These hazards are silent — nothing fails, the history is simply wrong — so they must be written as rules:
+
+- **Review staged changes hunk by hunk** for any file you did not edit alone this session. A stat listing does not show a peer's uncommitted hunk riding in with yours.
+- **Commit with `git commit --only <paths>`.** The index is shared, so a `git diff --cached` review is not atomic with the commit that follows it; `--only` commits exactly the named paths whatever a peer staged in between (a new file needs `git add -N` first).
+- **Count the `git status` lines against the files you edited before committing.** Fewer lines than files means a peer's commit absorbed some of yours; record where they landed and do not rewrite the peer's commit. Commit once the scoped tests pass; let the full suite gate the push, not the commit.
+- **Committing makes you publishable.** Any session's push publishes every commit beneath it. Commit promptly anyway, because uncommitted edits are lost to a peer's rebase or stash; when a commit must not ship yet, make it in a detached worktree.
+- **Report a commit with its hash and whether it is pushed.** An unpushed commit is visible to every worktree and invisible in chat. When told to pick up another session's work, run `git log --all -- <its files>` first and say which commit you found and whether its author is still running.
+- **After reporting a fix other sessions need, `git fetch` again before building it and again before committing.** The session you told is often already in that file and lands first.
+- **A command that gates another runs in its own tool call.** `;` passes control on regardless, `&&` propagates failure but never judgement, and a pipe reports its last command's status (`git rebase … | tail -1` hides a conflict). Read the test summary or the stack listing, then commit or push in a separate call; a multi-step publish script stops on its first failed step (`set -e`). A backgrounded `cmd; echo $?` reports the `echo` — confirm a long-running command from its artifact, a file whose timestamp moved.
+- **Allocate unit, bolt, intent, ADR and edge-case numbers at push time.** Work under placeholders (`U-TBD`, `ADR-TBD`) in filenames, headings and cross-references. Immediately before publishing: fetch, rebase, read the next free numbers at that commit, substitute every placeholder, record the claims in the same commit, push. The push is the only lock a shared repository has, so a lost race becomes a rejected push — re-stamp and retry — instead of a double claim found after other files cite it; reserving at sign-off and re-checking narrows the race but cannot see a rival claim committed and unpushed elsewhere. Never renumber after a successful push.
+- **Substitute placeholders by anchored line, never file-wide, then read every changed line of the registry diff** and ask of each whether you wrote that placeholder. A substitution count that equals its own pre-count proves the script is consistent, not that it only touched your rows.
 
 ### Section 7 — Review Behavior
 
