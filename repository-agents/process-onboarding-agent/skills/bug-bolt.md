@@ -18,15 +18,24 @@ Ask the engineer four questions in one message:
 > 1. **What is the bug?** Describe the symptom — what the user or system experiences.
 > 2. **Where does it occur?** Name the component, file, function, or user flow.
 > 3. **How is it reproduced?** List the steps or conditions that trigger it.
-> 4. **What is the expected behavior?** What should happen instead?"
+> 4. **What is the expected behavior?** What should happen instead?
+> 5. **How does it vary?** Slower or faster, first time or every time, one direction or both, more data or less."
 
-Record all four answers before proceeding.
+Question 5 matters most for reports of feel (lag, jank, a pause, a jump), which always happen and are diagnosed by how they vary: a cost gets worse when the action is slower, a discontinuity gets better. Ask it before writing any diagnosis.
+
+Record all five answers before proceeding.
+
+**Take a baseline of the whole gate before the fix.** Run the full test suite once on the unmodified main branch and record the totals, not only the named failures. A reporter describes what they noticed; the tree may hold other reds, and the closing claim should be a delta against this baseline rather than "the named tests now pass".
+
+**A red the baseline finds that is not this bug gets a backlog row now.** Name it and file it (or name the existing row) before proceeding. "Pre-existing" says whose it is not, never whose it is — recorded only in the unit, it belongs to nobody.
 
 ---
 
 ## Step 2 — Recurrence Check
 
-Search the project's retro files and incident files for similar descriptions.
+First grep the artefact's own names — the failing file, the test title, the function under suspicion — across the backlog, `ops/operate/rca/`, retros and incidents. A row is written in its raiser's vocabulary and a description search uses yours; the artefact's name is the one string both used. If an RCA names the artefact, read its Recommendations before writing the fix — it may already say this is one instance of a class and what fixes the class.
+
+Then search the project's retro files and incident files for similar descriptions.
 
 - If a similar pattern appears in more than one retro or incident: note it as **recurring**. Root Cause Analysis is mandatory after the fix.
 - If no similar pattern is found: proceed without the RCA flag.
@@ -42,6 +51,10 @@ Identify the minimum set of changes needed to fix the bug without side effects. 
 > "Is this fix isolated to [component], or are there other places where the same logic runs?"
 
 If multiple components are affected, each becomes a separate unit.
+
+**Taking the cheap fix over the structural one.** When you knowingly choose a local fix over a structural one, write its expiry condition into the unit — and phrase it against the cause left in place, not the symptom just fixed. "If the flash returns" never fires, because the fix makes that one symptom unlikely; "if anything else traceable to [the mechanism] appears" does.
+
+**At the third unit, ask whether this is still a bug bolt.** Each added unit can be individually justified while the total becomes a redesign. Write one line in the bolt file: is this still a defect being fixed, or a change being designed? "Still a bug bolt" is a legitimate answer. If the answer is no, the next unit goes in a new feature or NFR bolt — recording the answer and carrying on is not an option.
 
 ---
 
@@ -70,6 +83,8 @@ At least one unhappy-path AC must be included.
 
 **Pre-generation checks:** Grep for the affected function or component before generating. Confirm no duplicate fix already exists.
 
+**Fix one, grep all.** Grep the codebase for the defect's *shape*, not only the reported site, and record every hit in the unit with its disposition — fixed, or safe and why. The list, not "I checked". Each "safe" argues the risk: state the condition under which that site would fail and why it cannot arise. "Same shape as the one I fixed" is not a disposition, because sites that look alike can differ in exactly the operator that matters.
+
 **Observability:** Define a log entry or metric that confirms the bug no longer occurs in production.
 
 ---
@@ -95,11 +110,20 @@ After output is accepted, confirm the fix:
 
 Do not close the unit until the engineer confirms the fix is verified.
 
+Evidence rules for the verification:
+
+- **Falsify the instrument before trusting it.** Run the reproduction with the fix reverted: if it is green, it cannot validate the fix. If it reddens but names different cases on each run, it reproduces without attributing and cannot validate a fix either.
+- **A harness you built is a model.** When the defect will not reproduce on demand and you construct one (a stall, a frozen clock, a stubbed network), write one line naming what it does not model, and run at least one condition it cannot produce before writing "fixed".
+- **Read the suite total before and after the fix, not the target's colour.** Green on the target and red elsewhere is a fix plus a new defect, and the new one is yours.
+- **A run with no summary line ran nothing.** A runner or script that reports a result must check the test summary exists first; an empty run is invalid, re-run, and recorded — never counted as green.
+- **A refuted repair is reverted, not softened.** If the fix fails the same way it did before, the diagnosis was wrong: revert the change, record the attempt in the bolt file, and do not keep it with a weaker comment because it is defensible on its own terms.
+- **A determinism claim needs a second varied condition.** Before writing "fails only under X", vary one more thing (another host, ordering, worker count) — or write what was observed: "reproduced 2/2 in a full run, 0/3 in isolation, not seen elsewhere".
+
 ---
 
 ## Step 7 — Close
 
 1. Mark unit Done. Mark bolt Done. Update the backlog.
-2. Create a retro file and run the Post-Retro Improvement Workflow.
+2. Create a retro file and run the Post-Retro Improvement Workflow. Every action the retro hands on gets a backlog row in the same commit; a retro's actions table is not reopened by anything, the backlog is.
 3. If the bug was flagged as **recurring** in Step 2: read `process-onboarding-agent/skills/root-cause-analysis.md` and run it now. Do not skip.
 4. If the bug caused a production impact: create or update an incident file at `ops/operate/incidents/`.

@@ -94,7 +94,7 @@ If an incident file does not already exist for this event, create one now at `op
 
 ## Step 7 — Close and Schedule the Retro
 
-1. Mark unit Done. Mark bolt Done. Update the backlog.
+1. Mark unit Done. Mark bolt Done. Update the backlog — and the bolt's backlog row carries the owed retro as a date, `retro + RCA due YYYY-MM-DD` (fix time plus 24 hours). A phrase like "owed within 24 h" cannot be compared to today; a date can, by a grep at session start.
 2. State clearly:
 
 > "The hotfix is complete. A retro is mandatory within 24 hours — please schedule it now. The incident file is at [path]. Run `process-onboarding-agent/skills/root-cause-analysis.md` during or immediately after the retro."
