@@ -78,6 +78,8 @@ If a staging environment is available:
 
 If no staging environment exists: note this explicitly and ask the engineer to confirm acceptance of the risk before deploying.
 
+**Then ship it — this step blocks.** A P1 is an active outage, and a gated fix that has not deployed is not a fix: the users hitting it cannot tell the difference. Deploy as soon as the engineer authorizes it, and do not treat a green gate as the end of the incident. If the deploy cannot happen now, record the reason in the incident file and state that the outage is ongoing. Confirm the RUNNING build is the commit you meant to ship — a deploy that predates the fix passes every other signal identically.
+
 ---
 
 ## Step 6 — Create the Incident File
@@ -94,7 +96,7 @@ If an incident file does not already exist for this event, create one now at `op
 
 ## Step 7 — Close and Schedule the Retro
 
-1. Mark unit Done. Mark bolt Done. Update the backlog.
+1. Mark unit Done and bolt Done **only after a production observation confirms the fix** — the running build matches the fix commit, and the symptom is gone on the live surface that failed. Until then both stay In Progress with "awaiting production verification" recorded, and the incident stays Open (measure its duration to the deploy, not the gate). Then update the backlog.
 2. State clearly:
 
 > "The hotfix is complete. A retro is mandatory within 24 hours — please schedule it now. The incident file is at [path]. Run `process-onboarding-agent/skills/root-cause-analysis.md` during or immediately after the retro."
