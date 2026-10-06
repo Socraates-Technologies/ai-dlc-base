@@ -95,6 +95,14 @@ After output is accepted, confirm the fix:
 
 Do not close the unit until the engineer confirms the fix is verified.
 
+**And when the behaviour itself — not only its guard — is one the gate cannot exercise, the unit is Done only against a device observation recorded in the unit.** A native gesture, a platform negotiation, a real scroll event: the gate asserts around these, not through them, and a suite green for the parts it can reach says nothing about the part it cannot. Write the observation into the unit — date, build or commit, what was done, what was seen — not into a chat message. A drag-to-reorder once reached the trunk behind sixteen green tests having never once worked on a phone; the observation that would have caught it took two minutes.
+
+**And when an attempt is refuted, strike it everywhere it was stated as the cause.** A fix that fails verification is recorded as refuted in the bolt file — correctly. But the same hypothesis had also been written, as fact, into the unit's notes, into a code comment above the function it blamed, and into an edge case's prose. Each outlived its refutation, and the next attempt read three confident statements of a cause the bolt file had already withdrawn. The bolt entry that records a refutation lists every other place the hypothesis is stated and corrects them **in the same commit** — a code comment becomes *"a real latent defect, not this one"*, a notes paragraph is struck or prefixed with the date it was refuted, an edge case is re-pointed at what it actually contains. A refuted cause left standing anywhere is a pointer to the wrong place, and the reader who follows it will be the one under the most time pressure.
+
+**Symptom fixes require verification against the symptom.** For a *user-reported symptom*, a green local gate plus a plausible mechanism is "shipped", not "fixed" — the unit's symptom is not resolved until it is **verified on a real device or environment against that exact symptom**. A unit test can prove a prop is set or a handler fires; it cannot prove the behaviour on real hardware (that a native player releases, that an embedded third-party page initialises). Do not mark the symptom fixed on mechanism alone.
+
+**Confirm where an error's text/code originates before attributing a cause.** When the symptom has specific wording or an error code, first establish whether it comes from app code, a library, or an embedded third-party page — do not anchor on the first plausible mechanism. *(Maestro, 2026-07-16: a fix targeted the app's native video player when the "Error 153" text on screen was the embedded YouTube player's own overlay. The fix shipped, and the error stayed.)*
+
 ---
 
 ## Step 7 — Close
