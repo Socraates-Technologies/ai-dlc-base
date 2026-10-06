@@ -57,6 +57,7 @@ Before generating code for this unit, the agent must run these checks:
 - [ ] Before a new test queries a control, selector or route, check the plan's later units for its removal; if one removes it, anchor on what survives or write the coupling into that unit's Register in the same commit
 - [ ] If this unit moves a component to a different host or container, list what the old host supplied implicitly (layout insets, context, error boundaries, wrappers) and confirm the new one supplies it *(the component's own code and tests do not change, so nothing else looks)*
 - [ ] If an existing action starts writing to a table it did not write before, grep the suites that perform that action and tear down its parent rows, and confirm each cleanup covers the new table
+- [ ] If meeting an AC literally would do something the intent, an ADR or another AC forbids, put both readings to the engineer before code and record the answer here *(an interpretation written only into the evidence reaches the engineer after it ships)*
 
 ---
 
@@ -104,6 +105,7 @@ Before generating code for this unit, the agent must run these checks:
 - [ ] Auth checked on every new endpoint
 - [ ] Any deploy, provisioning or scheduler script this unit ships has been run and what it created is recorded — or not running it is a backlog item with an owner *(tests prove the code, never that the environment was provisioned)*
 - [ ] Where this unit removes a control or code path, everything it referenced is checked for a remaining reachable caller *(lint finds unused symbols, never a branch that is still read and written but can no longer be reached)*
+- [ ] Where this unit adds or tightens a constraint, every writer of the constrained columns is listed here, each with a test at the layer that builds the row writing the newly constrained shape *(a constraint changes behaviour only where a writer was already quietly wrong, and a test of the layer below passes while that writer fails)*
 - [ ] The shared CI gate's conclusion at this unit's commit is recorded, with the skipped count of every suite quoted — a skipped test is not a passed one, and a run whose job never started is recorded as "no job ran" and replaced by a full package-wide local run, never as green
 - [ ] Each falsification probe (revert the code an AC depends on; the suite must go red) is recorded by name with its result, after proving the mutation applied (`git diff --stat` non-empty). A green probe is a finding: close the gap — commonly every case shares one fixture value — and re-run it to red; where the behaviour is guarded twice, record it as unverified defence naming both guards
 - [ ] Where the design estimated cost or latency, one real production log line measuring it is recorded with the time it was read *(an estimate nobody is obliged to check stays an estimate)*
