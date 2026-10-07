@@ -49,6 +49,8 @@ Read every manifest found within the agreed scope. Extract:
 
 Produce an internal inventory list (do not present it to the engineer yet — it is input for Steps 3 and 4).
 
+**The RUNTIME is a dependency too, and no manifest lists it.** Read the version the product actually runs from wherever it is pinned — the container base image, the CI setup step (`setup-node`, `setup-python`, `setup-java`, …), a version file (`.nvmrc`, `.python-version`, `.tool-versions`), and the developer prerequisite in the project's setup docs — and add it to the inventory with its upstream end-of-life date. **These pins must agree:** if the image and CI differ, the gate is testing a runtime production does not run. Advisory scanners report packages, not the runtime beneath them, and dependency bots often do not watch base images, so an end-of-life runtime is the one exposure this audit can miss while reporting zero findings; Step 4's EOL check is only as good as this read. A runtime floor can also block a patch: when a finding's patched version requires a newer runtime than the product runs, the runtime upgrade **is** the remediation and belongs in the same remediation bolt, not a later one. _(Ascent, 2026-08-07: a production `node:20` image ran three months past its end of life with nothing reporting it, and surfaced only because an unrelated advisory's patch required Node >=22.13 — unreachable until the runtime moved.)_
+
 ---
 
 ## Step 3 — Request the Tool-Assisted Scan
