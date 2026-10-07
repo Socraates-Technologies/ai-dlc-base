@@ -75,6 +75,7 @@ For each improvement, determine whether it is **generic** (beneficial to all AI-
 | Any file in `{FRAMEWORK_ROOT}/skills/` | Generic — skills are copied verbatim into every project |
 | Any `_template.md` file in `{FRAMEWORK_ROOT}/ops/` | Generic — templates are shared across all projects |
 | `{FRAMEWORK_ROOT}/rules/engagement.md` | Generic — copied verbatim into every project |
+| `{FRAMEWORK_ROOT}/rules/writing.md` | Generic — copied verbatim into every project |
 | `repository-agents/process-onboarding-agent/setup-guide.md` | Generic — the shared framework specification |
 | `repository-agents/process-onboarding-agent/onboard.md` | Generic — the shared onboarding protocol |
 | `{FRAMEWORK_ROOT}/rules/prompt-quality-gate.md` | Likely generic — evaluate content |
@@ -139,6 +140,7 @@ If the improvement is generic, determine the corresponding file in the base repo
 | `{FRAMEWORK_ROOT}/skills/mob-elab-prompts.md` or `review-checklist.md` | `repository-agents/process-onboarding-agent/setup-guide.md` — the section for that file (no standalone base file) |
 | `{FRAMEWORK_ROOT}/ops/[path]/_template.md` | `repository-agents/process-onboarding-agent/ops/[path]/_template.md` |
 | `{FRAMEWORK_ROOT}/rules/engagement.md` | `repository-agents/process-onboarding-agent/rules/engagement.md` |
+| `{FRAMEWORK_ROOT}/rules/writing.md` | `repository-agents/process-onboarding-agent/rules/writing.md` |
 | `{FRAMEWORK_ROOT}/rules/prompt-quality-gate.md` | `repository-agents/process-onboarding-agent/setup-guide.md` — the `rules/prompt-quality-gate.md` section (no standalone base file) |
 | `{FRAMEWORK_ROOT}/guidelines/acceptance-patterns.md` | `repository-agents/process-onboarding-agent/setup-guide.md` — the `guidelines/acceptance-patterns.md` section |
 | — (an improvement to onboarding itself) | `repository-agents/process-onboarding-agent/setup-guide.md` |

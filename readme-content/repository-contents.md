@@ -33,6 +33,7 @@ This repo is the **base template** — the source of truth that gets copied into
 | `repository-agents/process-onboarding-agent/ops/inception/codebase-findings/_template.md` | Template for one codebase finding file (summary, dated findings with sources examined, open questions). |
 | `repository-agents/process-onboarding-agent/ops/inception/dependency-map.md` | Intent dependency map. Records which intents depend on others and which interfaces are shared across intent boundaries; read before bolt planning, updated after every elaboration sign-off. |
 | `repository-agents/process-onboarding-agent/rules/engagement.md` | Engineer engagement monitoring — signals of disengagement, intervention script, and escalation protocol. Copied verbatim into every project. |
+| `repository-agents/process-onboarding-agent/rules/writing.md` | Writing rule — every sentence a person reads is Simplified Technical English (ASD-STE100): where it applies, the rules that matter most, how it meets the glossary. Copied verbatim into every project. |
 | `repository-agents/process-onboarding-agent/ops/inception/intents/_template.md` | Template for writing a feature intent (includes Implementation Summary section, written when all units under the intent are delivered) |
 | `repository-agents/process-onboarding-agent/ops/inception/elaborations/_template.md` | Template for logging a mob elaboration session |
 | `repository-agents/process-onboarding-agent/ops/build/units/_template.md` | Template for an atomic unit of work |
@@ -66,6 +67,7 @@ The onboarding agent first asks where your process documentation lives, then ins
         security.md
         architecture.md
         engagement.md
+        writing.md
       skills/
         mob-elab-prompts.md
         review-checklist.md

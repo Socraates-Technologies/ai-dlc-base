@@ -457,6 +457,7 @@ Create this directory tree at the root of your repository:
     security.md              ← never/always security rules
     architecture.md          ← ADRs — decisions and their rationale
     engagement.md            ← engineer engagement monitoring signals and intervention protocol
+    writing.md               ← Simplified Technical English (ASD-STE100) for every sentence a person reads
   skills/
     mob-elab-prompts.md      ← interactive protocol and prompts for elaboration sessions
     review-checklist.md      ← structured lens for reviewing AI output
@@ -568,6 +569,7 @@ Three to five **hard-stop prohibitions** that the AI must have in working memory
 - Conventions and patterns: `{FRAMEWORK_ROOT}/rules/code-standards.md`
 - Security rules: `{FRAMEWORK_ROOT}/rules/security.md`
 - Architecture decisions: `{FRAMEWORK_ROOT}/rules/architecture.md`
+- Writing rule — ASD-STE100 for every sentence a person reads, prose and UI copy alike: `{FRAMEWORK_ROOT}/rules/writing.md`
 ```
 
 Keep the hard-stop list to five items maximum. Anything beyond five belongs in `code-standards.md`, not here.
@@ -821,6 +823,10 @@ Add an ADR whenever a new cross-cutting decision is made — especially ones whe
 
 Copy this file verbatim from `process-onboarding-agent/rules/engagement.md` to `{FRAMEWORK_ROOT}/rules/engagement.md`. It defines two monitoring protocols: (1) engineer disengagement signals — when to intervene, what to say, and how to handle continued non-engagement; (2) failed output circuit breaker — if AI output for the same unit is rejected 3 consecutive times with the same underlying failure, execution stops, a diagnostic question is asked, and the outcome is recorded in the unit's Prompt Log. The master rule file Section 6 routes to it with a single mandatory-read line — do not inline its contents.
 
+### `rules/writing.md`
+
+Copy this file verbatim from `process-onboarding-agent/rules/writing.md` to `{FRAMEWORK_ROOT}/rules/writing.md`. It makes every sentence a person reads Simplified Technical English (ASD-STE100 Issue 8): where the rule applies and where it does not, the rules that matter most (approved words, noun clusters of three, active voice, 20 and 25 word sentences, six-sentence paragraphs), and how it meets the domain glossary. Existing text is not rewritten; `skills/review-checklist.md` Section 9 checks new prose.
+
 ---
 
 ## Step 4 — Write the Skills Files
@@ -889,9 +895,11 @@ Structured review sections covering all five AI failure modes:
 | AI-Specific Checks | Hallucinated library calls; prompt log; scope creep |
 | Observability | Missing production evidence; silent failures |
 | Deployment Readiness | Configuration errors; breaking changes |
+| Writing | Prose a reader can misread |
 
 Key items that must be present:
 - Feature verified in a real environment — tests passing alone is not sufficient
+- **Every new sentence a person reads obeys `rules/writing.md` (ASD-STE100).** Read the prose the diff adds: documentation, commit message, UI copy, a tool's error line, a code comment, and the reply itself. Check the four counts that break most often: a procedure sentence has 20 words or fewer, a description sentence has 25 or fewer, a noun cluster has three nouns or fewer, a paragraph has six sentences or fewer. Then check the voice (active), the mood of an instruction (imperative), and the nouns (the glossary's terms, never a banned synonym). Text that already existed and that the diff does not touch is out of scope
 - Any AC asserting a page/route is "accessible" is verified by a rendered 200 (following redirects) with the expected content actually visible — text present and legible, images decoded (non-zero natural dimensions) — never a build pass or a 3xx redirect alone. The same decode check applies to any end-to-end test that renders an image the user is shown, whether or not an AC says "accessible": an image incidental to a flow is still something the user sees broken, and a later policy change (e.g. a Content-Security-Policy) can block it while a visibility-only assertion stays green *(Ascent, 2026-10-06: a CSP blocked a picker's previews for 65 days behind a green gate)*.
 - After any deploy, a post-deploy smoke suite passes against the live deployed URL, asserting key pages render their actual content (text visible, images decoded, primary auth/entry reachable) rather than merely returning a 200 status — a deploy is not done until this passes, and whoever is driving the deploy (the AI assistant included) runs it and reports the result rather than handing a runnable check back to the engineer
 - **Every claim that something is covered, enforced or unchanged cites the artifact that proves it — or is marked unverified.** "Asserted in a unit test", "the compiler enforces this", "the guard is untouched" are claims: name the test, paste the output, or run the check; if you cannot, write "unverified" and say what would settle it. A claim marked unverified invites the look that a believed one prevents — a false claim of coverage is often exactly why nobody inspected the seam that later failed

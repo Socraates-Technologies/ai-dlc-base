@@ -35,6 +35,7 @@ For each improvement, the skill classifies it as:
 | `process-onboarding-agent/skills/*.md` | Generic — skills are copied verbatim into every project |
 | `process-onboarding-agent/ops/**/_template.md` | Generic — templates are shared across all projects |
 | `process-onboarding-agent/rules/engagement.md` | Generic — copied verbatim into every project |
+| `process-onboarding-agent/rules/writing.md` | Generic — copied verbatim into every project |
 | `process-onboarding-agent/setup-guide.md` | Generic — the shared framework specification |
 | `process-onboarding-agent/onboard.md` | Generic — the shared onboarding protocol |
 | `process-onboarding-agent/rules/prompt-quality-gate.md` | Likely generic — evaluated by content |
