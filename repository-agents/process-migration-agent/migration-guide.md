@@ -31,6 +31,10 @@ project-root/
       uat.md                   ← template (pre-built)
       process-health.md        ← template (pre-built)
       dependency-audit.md      ← template (pre-built)
+      architecture-review.md   ← template (pre-built)
+      disk-hygiene.md          ← template (pre-built)
+      solution-shaping.md      ← template (pre-built)
+      process-visualization.md ← template (pre-built)
       knowledge-promotion.md   ← template (pre-built)
       new-engineer-induction.md ← template (pre-built)
       bug-bolt.md              ← template (pre-built)
@@ -121,6 +125,10 @@ Before migrating, understand which files are which:
 - `ai-dlc/skills/uat.md`
 - `ai-dlc/skills/process-health.md`
 - `ai-dlc/skills/dependency-audit.md`
+- `ai-dlc/skills/architecture-review.md`
+- `ai-dlc/skills/disk-hygiene.md`
+- `ai-dlc/skills/solution-shaping.md`
+- `ai-dlc/skills/process-visualization.md`
 - `ai-dlc/skills/knowledge-promotion.md`
 - `ai-dlc/skills/new-engineer-induction.md`
 - `ai-dlc/skills/bug-bolt.md`
@@ -298,11 +306,17 @@ Files to refresh:
 | `process-onboarding-agent/skills/uat.md` | `{NEW_FRAMEWORK_ROOT}/skills/uat.md` |
 | `process-onboarding-agent/skills/process-health.md` | `{NEW_FRAMEWORK_ROOT}/skills/process-health.md` |
 | `process-onboarding-agent/skills/dependency-audit.md` | `{NEW_FRAMEWORK_ROOT}/skills/dependency-audit.md` |
+| `process-onboarding-agent/skills/architecture-review.md` | `{NEW_FRAMEWORK_ROOT}/skills/architecture-review.md` |
+| `process-onboarding-agent/skills/disk-hygiene.md` | `{NEW_FRAMEWORK_ROOT}/skills/disk-hygiene.md` |
+| `process-onboarding-agent/skills/solution-shaping.md` | `{NEW_FRAMEWORK_ROOT}/skills/solution-shaping.md` |
+| `process-onboarding-agent/skills/process-visualization.md` | `{NEW_FRAMEWORK_ROOT}/skills/process-visualization.md` |
 | `process-onboarding-agent/skills/knowledge-promotion.md` | `{NEW_FRAMEWORK_ROOT}/skills/knowledge-promotion.md` |
 | `process-onboarding-agent/skills/new-engineer-induction.md` | `{NEW_FRAMEWORK_ROOT}/skills/new-engineer-induction.md` |
 | `process-onboarding-agent/skills/bug-bolt.md` | `{NEW_FRAMEWORK_ROOT}/skills/bug-bolt.md` |
 | `process-onboarding-agent/skills/hotfix-bolt.md` | `{NEW_FRAMEWORK_ROOT}/skills/hotfix-bolt.md` |
 | `process-onboarding-agent/skills/nfr-bolt.md` | `{NEW_FRAMEWORK_ROOT}/skills/nfr-bolt.md` |
+
+The table above lists the pre-built skills as of this guide's last update. Treat it as a checklist, not a closed set: refresh **every** `*.md` under `process-onboarding-agent/skills/` in the new base, and copy `process-onboarding-agent/ops/inception/codebase-findings/` (template and index) if the project has no such folder yet.
 
 Also refresh the engagement rule:
 
