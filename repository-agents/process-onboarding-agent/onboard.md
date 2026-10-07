@@ -87,6 +87,7 @@ Use `FRAMEWORK_ROOT` as the base path for every framework file created during th
    **Do not treat the following as evidence of existing setup** — they are part of the base repo and are present in every fresh copy:
    - `process-onboarding-agent/ops/` and all files inside it (including `process-onboarding-agent/ops/inception/dependency-map.md`)
    - `process-onboarding-agent/rules/engagement.md`
+   - `process-onboarding-agent/rules/writing.md`
    - `process-onboarding-agent/skills/compact-docs.md`
    - `process-onboarding-agent/skills/root-cause-analysis.md`
    - `process-onboarding-agent/skills/solution-shaping.md`
@@ -138,7 +139,7 @@ Once all nine questions are answered, execute Steps 1–9 of the setup guide in 
 1. Create the full `{FRAMEWORK_ROOT}/` folder structure with all template files.
 2. Write the master rule file (all 9 sections) using interview answers for Sections 1–5 and Section 9. **Replace every `{FRAMEWORK_ROOT}` placeholder in the templates with the actual resolved path** (e.g. `docs/process/intent-execution-framework`). The master rule file must contain real paths — never the literal string `{FRAMEWORK_ROOT}`.
 3. Write all `rules/` files using interview answers and guide defaults.
-4. Copy all pre-built skills files from `process-onboarding-agent/skills/` into `{FRAMEWORK_ROOT}/skills/` verbatim (do not modify their content). Also copy `process-onboarding-agent/rules/engagement.md` to `{FRAMEWORK_ROOT}/rules/engagement.md` and all `process-onboarding-agent/ops/` template files into `{FRAMEWORK_ROOT}/ops/`.
+4. Copy all pre-built skills files from `process-onboarding-agent/skills/` into `{FRAMEWORK_ROOT}/skills/` verbatim (do not modify their content). Also copy `process-onboarding-agent/rules/engagement.md` to `{FRAMEWORK_ROOT}/rules/engagement.md`, `process-onboarding-agent/rules/writing.md` to `{FRAMEWORK_ROOT}/rules/writing.md`, and all `process-onboarding-agent/ops/` template files into `{FRAMEWORK_ROOT}/ops/`.
 5. Write all `guidelines/` files (domain glossary pre-populated from interview question 6; others as stubs).
 6. Write `Instructions2FDE.md` at `{FRAMEWORK_ROOT}/Instructions2FDE.md`.
 7. Write `{FRAMEWORK_ROOT}/README.md`.
@@ -184,7 +185,7 @@ Phases to execute:
 2. Create `{FRAMEWORK_ROOT}/guidelines/forbidden-zones.md` — ask the engineer: *"Which files, modules, or patterns must the AI never modify without senior engineer approval?"* Record their answer as the initial forbidden zones list.
 3. Create `{FRAMEWORK_ROOT}/guidelines/entry-points.md` — ask the engineer: *"Which modules or features should AI-DLC Bolts start with?"* Record their answer as the initial entry points list.
 4. Create `{FRAMEWORK_ROOT}/rules/code-standards.md` from extracted patterns.
-5. Create the full `{FRAMEWORK_ROOT}/` folder structure with all remaining files and templates. Copy all pre-built skills files from `process-onboarding-agent/skills/` into `{FRAMEWORK_ROOT}/skills/` verbatim. Also copy `process-onboarding-agent/rules/engagement.md` to `{FRAMEWORK_ROOT}/rules/engagement.md` and all `process-onboarding-agent/ops/` template files into `{FRAMEWORK_ROOT}/ops/`.
+5. Create the full `{FRAMEWORK_ROOT}/` folder structure with all remaining files and templates. Copy all pre-built skills files from `process-onboarding-agent/skills/` into `{FRAMEWORK_ROOT}/skills/` verbatim. Also copy `process-onboarding-agent/rules/engagement.md` to `{FRAMEWORK_ROOT}/rules/engagement.md`, `process-onboarding-agent/rules/writing.md` to `{FRAMEWORK_ROOT}/rules/writing.md`, and all `process-onboarding-agent/ops/` template files into `{FRAMEWORK_ROOT}/ops/`.
 6. Seed `{FRAMEWORK_ROOT}/ops/inception/codebase-findings/` with one finding file per segment analyzed in Phase M1 (per setup-guide.md M2.5), so the archaeology already performed for this onboarding session is not lost — future intents touching the same code check these files before re-analyzing it.
 
 ### Step 5-M — Blast radius controls (Phase M3)

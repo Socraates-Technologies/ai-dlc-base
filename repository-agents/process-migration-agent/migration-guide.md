@@ -18,6 +18,7 @@ project-root/
     setup-guide.md             ← onboarding protocol
     rules/
       engagement.md            ← template (pre-built)
+      writing.md               ← template (pre-built)
       prompt-quality-gate.md   ← GENERATED — project-specific
       code-standards.md        ← GENERATED — project-specific
       security.md              ← GENERATED — project-specific
@@ -113,6 +114,7 @@ Before migrating, understand which files are which:
 
 **Template (pre-built) — move, then refresh from new `process-onboarding-agent/`:**
 - `ai-dlc/rules/engagement.md`
+- `ai-dlc/rules/writing.md`
 - `ai-dlc/skills/compact-docs.md`
 - `ai-dlc/skills/root-cause-analysis.md`
 - `ai-dlc/skills/design-session.md`
@@ -309,6 +311,7 @@ Also refresh the engagement rule:
 | Source (new base) | Destination |
 |---|---|
 | `process-onboarding-agent/rules/engagement.md` | `{NEW_FRAMEWORK_ROOT}/rules/engagement.md` |
+| `process-onboarding-agent/rules/writing.md` | `{NEW_FRAMEWORK_ROOT}/rules/writing.md` |
 
 ### 2e — Refresh ops templates
 
