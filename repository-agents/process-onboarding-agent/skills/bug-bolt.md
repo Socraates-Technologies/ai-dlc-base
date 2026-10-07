@@ -37,6 +37,8 @@ Record all five answers before proceeding.
 
 First grep the artefact's own names — the failing file, the test title, the function under suspicion — across the backlog, `ops/operate/rca/`, retros and incidents. A row is written in its raiser's vocabulary and a description search uses yours; the artefact's name is the one string both used. If an RCA names the artefact, read its Recommendations before writing the fix — it may already say this is one instance of a class and what fixes the class.
 
+**When the defect's artefact is not a file, search by its contract.** A defect in a message, request or payload sent to a third party has no name to grep, and the names you can grep describe this instance only. Search by the destination or the contract as well: the request type, the provider, the fields the payload carries. A second defect found in the same artefact during this bolt is a recurrence: flag it. A missed generalisation fails no test; it shows only when the next instance ships.
+
 Then search the project's retro files and incident files for similar descriptions.
 
 - If a similar pattern appears in more than one retro or incident: note it as **recurring**. Root Cause Analysis is mandatory after the fix.
@@ -66,9 +68,11 @@ If multiple components are affected, each becomes a separate unit.
 
 **At the third unit, ask whether this is still a bug bolt.** Each added unit can be individually justified while the total becomes a redesign. Write one line in the bolt file: is this still a defect being fixed, or a change being designed? "Still a bug bolt" is a legitimate answer. If the answer is no, the next unit goes in a new feature or NFR bolt — recording the answer and carrying on is not an option.
 
-**Create bolt and unit files with their evidence empty.** Create them with **Status: In Progress** and the Definition of Done unticked. Every evidence section (probe results, AC ticks, measured numbers, gate output) is either absent or says *"not yet run"*. Write planned probes as a **list, never a results table**, because a table with a "what went red" column is a form, and forms get filled in before anything has run. Tick an AC only after reading the artefact it names. If the AC cites gate output, read the gate output, not the diff that was supposed to produce it. **One exception to "not yet run":** if your gate checks a section for completeness (an AC-to-test traceability check, say), leave that section absent until it can be filled. A placeholder fails the gate before the work it describes has run.
+**Create bolt and unit files with their evidence empty.** Create them with **Status: In Progress** and the Definition of Done unticked, and add their backlog rows (bolt and unit, In Progress) in the same commit. Other sessions read the backlog to see what is in flight, so a bolt that reaches it only at Close is invisible while it runs. Every evidence section (probe results, AC ticks, measured numbers, gate output) is either absent or says *"not yet run"*. Write planned probes as a **list, never a results table**, because a table with a "what went red" column is a form, and forms get filled in before anything has run. Tick an AC only after reading the artefact it names. If the AC cites gate output, read the gate output, not the diff that was supposed to produce it. **One exception to "not yet run":** if your gate checks a section for completeness (an AC-to-test traceability check, say), leave that section absent until it can be filled. A placeholder fails the gate before the work it describes has run.
 
 *(Ascent, 2026-08-07: a bolt file was drafted with Status: Done, a ticked Definition of Done and a filled-in probe table naming what went red, before a single probe had run. The same session then ticked an AC from the code's intent, and the closeout gate falsified it on its first run. Ascent, 2026-10-06: a unit created with "not yet run" under its traceability heading failed the project's AC-traceability gate check and cost a full gate cycle.)*
+
+**Leave each planned probe's red count blank until the guards exist.** The count depends on the guard cases (how many sit on one code path, how many a seam reaches), not on the source, so a plan cannot know it. Write the prediction after the guard cases are written and before the first probe runs, and correct a wrong prediction in the open.
 
 ---
 
@@ -95,7 +99,7 @@ At least one unhappy-path AC must be included.
 - In scope: the specific function, query, component, or flow causing the bug
 - Out of scope: refactoring unrelated code, adding features, "while we're here" changes
 
-**Pre-generation checks:** Grep for the affected function or component before generating. Confirm no duplicate fix already exists.
+**Pre-generation checks:** Grep for the affected function or component before generating. Confirm no duplicate fix already exists — and `git fetch` first and check the default branch, not only your checkout. A fix you found rather than were given (a flagged exception, a defect in a shared gate) has no brief to say whether another session already builds it.
 
 **Fix one, grep all.** Grep the codebase for the defect's *shape*, not only the reported site, and record every hit in the unit with its disposition — fixed, or safe and why. The list, not "I checked". Each "safe" argues the risk: state the condition under which that site would fail and why it cannot arise. "Same shape as the one I fixed" is not a disposition, because sites that look alike can differ in exactly the operator that matters.
 

@@ -120,6 +120,8 @@ After each endpoint, ask:
 
 **Named-act check:** A contract line describing something a person chose, selected, approved or confirmed must name the surface where that happens, or say it is out of scope and which unit owns it. A noun with no referent passes "every AC is testable", because each reader supplies the missing mechanism from their own head.
 
+**Client-refusal check:** For each server change, read what each client sends in the states the design acts on — what it already refuses, filters out or disables before the request leaves. A server change for a request no client sends is signed off, assessed and built for nothing.
+
 ---
 
 ## Step 4 — Data Model
@@ -147,6 +149,8 @@ After each entity, ask:
 **Precedent check:** Before closing the data model, for every field whose nullability, default or "means none" representation you are about to decide, search the existing schema and migrations for a field that already answers the same question. Follow it, or state why this case differs — a convention settled in a migration comment is not an ADR, so the conflict check below will not see it.
 
 **A claim about what an existing module contains is a precedent claim too.** Any design sentence saying what another module includes, returns, walks or exposes cites the file and line it was read from. Where it was not read, write the weaker sentence you can support, or make reading it the unit's first check — a sentence from memory becomes an AC that cannot be built.
+
+**A claim that something does NOT exist names its search.** Write the command and the files or lines read beside it, search for the behaviour as well as the symbol, and keep the sentence no wider than that scope. Give each grep whose empty result you rely on a positive control (a term it must match): a broken pattern also returns nothing, and that looks like good news. The risk assessment applies the same rule, but one ceremony later, after the constraint is signed off.
 
 **Shared-interface check:** Read `process-onboarding-agent/ops/inception/dependency-map.md` § Shared Interfaces and, for every entity this design creates, name each row that reaches it — a row reading "every intent that adds X" binds this design as soon as it adds an X. Write those rows into Elaboration Constraints and give the unit that adds the entity the AC the row requires. The map is otherwise read only at sign-off, after every AC is fixed.
 

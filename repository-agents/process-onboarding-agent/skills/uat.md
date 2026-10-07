@@ -6,6 +6,8 @@
 
 **Three paths:** The engineer may choose to conduct UAT now, defer it to a later date, or mark it as not required. All three choices are recorded in the intent file. The intent can only move to status Implemented after a UAT Sign-off entry exists — regardless of which path was taken.
 
+**A change that spans every intent has its own trigger.** A hostname, bundle id, sender address or product name changes beneath every intent at once. It has no units and no ACs, so the trigger above never fires for it. Every ship or build record carries a **UAT:** line when it is written: done, owed (with a date), or not applicable with a reason. A record with no UAT line is the only wrong answer.
+
 ---
 
 ## Step 1 — Identify the Intent and Read Its Units
