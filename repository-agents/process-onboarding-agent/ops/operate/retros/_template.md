@@ -52,7 +52,7 @@ How many times did the engineer verify the same surface by hand for this bolt, a
 
 ## Actions
 
-Every action this retro hands on gets a backlog row in the same commit as the retro — nothing reopens a retro, and the backlog is what sessions read. An action discharged before the retro closes needs no row; say so in its Status.
+Each action handed on gets a backlog row in the retro's commit: nothing reopens a retro. An action done before close needs no row: say so in Status. A check asked for names what it reads and refuses, or that no script decides it.
 
 | # | Action | Owner | Target date | Status |
 |---|---|---|---|---|
