@@ -88,10 +88,11 @@ rm -rf ~/Library/Developer/Xcode/DerivedData/*
 
 Others at the same tier, if present: `~/Library/Caches/pnpm`, `~/.expo`, `~/Library/Caches/expo`, `~/.gradle/caches`, `~/Library/Caches/CocoaPods`, `~/.cache/pip`.
 
-Two gotchas:
+Three gotchas:
 
 - **A cache-clean command can refuse to run and still exit 0.** In a pnpm-configured project, Corepack intercepts `yarn cache clean` and prints a message without clearing anything. When a wrapper might intercept, delete the cache directory directly.
-- **Verify by re-measuring, not by reading the command's output.** Both failure modes are silent:
+- **Under zsh, one glob that matches nothing cancels the whole command line.** zsh's default `nomatch` option makes an unmatched glob an error before the command runs, so `rm -rf <empty dir>/* <cache A> <cache B>` removes nothing: the targets after the glob are skipped with it, and the only trace is a `no matches found:` line that is easy to read past. Keep one `rm` per target, as the block above is written, or `setopt null_glob` before a combined line. bash leaves an unmatched glob literal and is unaffected, which is why this does not reproduce in scripts. _(Ascent, 2026-10-05: an already-empty `DerivedData/*` cancelled a combined line, and the gradle and CocoaPods caches after it survived the batch; the re-measure below caught it.)_
+- **Verify by re-measuring, not by reading the command's output.** All of these failure modes are silent, or close to it:
 
 ```bash
 for d in ~/.nvm/.cache ~/Library/Caches/Yarn ~/.npm ~/Library/Developer/Xcode/DerivedData; do printf '%s\t' "$d"; du -sh "$d" 2>/dev/null | cut -f1 || echo gone; done
