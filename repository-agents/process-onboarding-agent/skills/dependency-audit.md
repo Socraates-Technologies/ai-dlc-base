@@ -161,6 +161,19 @@ _(makerclub, 2026-10-01: an older npm silently dropped every `libc` field a newe
 for any ecosystem whose lockfile records its writer's format (`Cargo.lock`, `poetry.lock`, `Gemfile.lock`'s
 `BUNDLED WITH`, Gradle lockfiles).
 
+**And a committed file the TOOLCHAIN generates moves with the toolchain.** Some files are written by a build or a code
+generator but checked in: a framework's type shim, generated route or schema types, a snapshot, a lockfile header. When
+a remediation upgrades the tool that writes one, the tool's expected content can change with it, and the usual habit
+of restoring that file as build churn is then exactly wrong: the old content stays committed, and every later build
+dirties every checkout again. So after the unit's build, treat any modified *tracked* file the build wrote as a finding
+and decide it explicitly: environment churn (restore it) or the tool's new canonical output (commit it with the
+upgrade, and say so in the unit's scope). Before committing the new content, confirm the gate still passes on a fresh
+checkout where the build has not run yet, because CI typically typechecks before it builds. This is the complement of
+the lockfile rule above: there, a hunk the upgrade did not cause is a defect; here, a generated change the upgrade did
+cause is part of the upgrade. _(Ascent, 2026-10-05: a Next.js 16.2 → 16.3 upgrade added an import to the committed
+`next-env.d.ts`; it surfaced only when a rebase refused the dirty tree, after the file had first been restored as
+churn.)_
+
 After creating all units, summarise:
 
 ```
